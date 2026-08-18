@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Nav from "./components/Nav";
 
 export default function Home() {
@@ -20,12 +21,12 @@ export default function Home() {
           open to anyone. No hidden ledgers. No closed books.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
+          <Link
             href="/events"
             className="bg-violet-600 hover:bg-violet-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
           >
             Explore Events
-          </a>
+          </Link>
           <a
             href="https://github.com/NovaFest-Labs/NovaEvents"
             target="_blank"
