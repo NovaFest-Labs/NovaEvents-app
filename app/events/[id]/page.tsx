@@ -13,7 +13,7 @@ export default async function EventDetailPage({ params }: Props) {
 
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Event header skeleton */}
-        <div className="mb-10 animate-pulse">
+        <div role="status" aria-live="polite" aria-label="Loading event details" className="mb-10 animate-pulse">
           <div className="h-8 bg-slate-700 rounded w-1/2 mb-3" />
           <div className="h-4 bg-slate-800 rounded w-1/3 mb-6" />
           <div className="h-4 bg-slate-800 rounded w-3/4" />
@@ -25,7 +25,7 @@ export default async function EventDetailPage({ params }: Props) {
             {/* Ticket tiers */}
             <section>
               <h2 className="text-xl font-semibold mb-4">Ticket Tiers</h2>
-              <div className="space-y-3 animate-pulse">
+              <div role="status" aria-live="polite" aria-label="Loading ticket tiers" className="space-y-3 animate-pulse">
                 {[0, 1].map((i) => (
                   <div
                     key={i}
@@ -44,7 +44,7 @@ export default async function EventDetailPage({ params }: Props) {
             {/* Sponsorships */}
             <section>
               <h2 className="text-xl font-semibold mb-4">Sponsorships</h2>
-              <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden animate-pulse">
+              <div role="status" aria-live="polite" aria-label="Loading sponsorships" className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden animate-pulse">
                 <div className="p-5 border-b border-white/10 flex justify-between">
                   <div className="h-4 bg-slate-700 rounded w-40" />
                   <div className="h-4 bg-slate-800 rounded w-20" />
@@ -59,7 +59,7 @@ export default async function EventDetailPage({ params }: Props) {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <div className="bg-slate-900 border border-white/10 rounded-xl p-6 animate-pulse">
+            <div role="status" aria-live="polite" aria-label="Loading event summary" className="bg-slate-900 border border-white/10 rounded-xl p-6 animate-pulse">
               <div className="h-4 bg-slate-800 rounded w-1/2 mb-4" />
               <div className="h-8 bg-slate-700 rounded w-3/4 mb-2" />
               <div className="h-3 bg-slate-800 rounded w-full mb-6" />
@@ -76,6 +76,7 @@ export default async function EventDetailPage({ params }: Props) {
             href="https://github.com/NovaFest-Labs/NovaEvents-api/issues/2"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="API issue #2 (opens in a new tab)"
             className="text-violet-500 hover:text-violet-400"
           >
             API issue #2
