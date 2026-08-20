@@ -31,6 +31,7 @@ export default function Home() {
             href="https://github.com/NovaFest-Labs/NovaEvents"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="View Contract on GitHub (opens in a new tab)"
             className="border border-white/20 hover:border-white/40 text-white font-medium px-6 py-3 rounded-lg transition-colors"
           >
             View Contract ↗
@@ -99,6 +100,7 @@ export default function Home() {
             href="https://grantfox.xyz"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Contribute on GrantFox (opens in a new tab)"
             className="inline-block bg-violet-600 hover:bg-violet-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
           >
             Contribute on GrantFox ↗

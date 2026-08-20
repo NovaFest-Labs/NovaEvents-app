@@ -15,7 +15,7 @@ export default function EventsPage() {
         </div>
 
         {/* Skeleton cards — replaced once API integration lands */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div role="status" aria-live="polite" aria-label="Loading events" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
@@ -37,6 +37,7 @@ export default function EventsPage() {
             href="https://github.com/NovaFest-Labs/NovaEvents-api/issues/1"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="API issue #1 (opens in a new tab)"
             className="text-violet-500 hover:text-violet-400"
           >
             API issue #1
