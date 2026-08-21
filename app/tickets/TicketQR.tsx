@@ -17,6 +17,8 @@ export default function TicketQR({ eventId, ticketId }: TicketQRProps) {
         bgColor="#0f172a"
         fgColor="#ffffff"
         level="M"
+        role="img"
+        aria-label={`QR code for ticket #${ticketId} check-in`}
       />
     </div>
   );
