@@ -15,6 +15,12 @@ export default function Nav() {
             Events
           </Link>
           <Link
+            href="/tickets"
+            className="text-sm text-slate-400 hover:text-white transition-colors"
+          >
+            My Tickets
+          </Link>
+          <Link
             href="/dashboard"
             className="text-sm text-slate-400 hover:text-white transition-colors"
           >
