@@ -26,11 +26,10 @@ Open [http://localhost:3000](http://localhost:3000).
 - Organizer dashboard — create events, manage tiers
 - Attendee view — browse events, buy tickets
 - Sponsor view — contribute to events, see public sponsorship breakdown
-- Ticket wallet — view owned tickets, show QR for check-in
 
-See the [Issues](https://github.com/OlaGreat/NovaEvents-app/issues) tab for scoped tasks.
+See the [Issues](https://github.com/NovaFest-Labs/NovaEvents-app/issues) tab for scoped tasks.
 
 ## Related repos
 
-- [NovaEvents contract](https://github.com/OlaGreat/NovaEvents) — Soroban smart contract (Rust)
-- [NovaEvents API](https://github.com/OlaGreat/NovaEvents-api) — off-chain indexing and notifications
+- [NovaEvents contract](https://github.com/NovaFest-Labs/NovaEvents) — Soroban smart contract (Rust)
+- [NovaEvents API](https://github.com/NovaFest-Labs/NovaEvents-api) — off-chain indexing and notifications
