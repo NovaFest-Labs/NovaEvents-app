@@ -27,7 +27,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - Attendee view — browse events, buy tickets
 - Sponsor view — contribute to events, see public sponsorship breakdown
 
-See the [Issues](https://github.com/NovaFest-Labs/NovaEvents-app/issues) tab for scoped tasks.
+See the [Issues](https://github.com/NovaFest-Labs/NovaEvents-app/issues) tab for scoped tasks, and read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 
 ## Related repos
 
