@@ -33,16 +33,22 @@ export default function DashboardPage() {
           <h2 className="text-xl font-semibold mb-6">Create New Event</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {["Event name", "Venue", "Description", "Funding goal (USDC)"].map(
-              (label) => (
-                <div key={label} className="flex flex-col gap-1">
-                  <label className="text-sm text-slate-400">{label}</label>
-                  <input
-                    disabled
-                    className="bg-slate-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white"
-                    placeholder="—"
-                  />
-                </div>
-              )
+              (label) => {
+                const id = `create-event-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+                return (
+                  <div key={label} className="flex flex-col gap-1">
+                    <label htmlFor={id} className="text-sm text-slate-400">
+                      {label}
+                    </label>
+                    <input
+                      id={id}
+                      disabled
+                      className="bg-slate-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white"
+                      placeholder="—"
+                    />
+                  </div>
+                );
+              }
             )}
           </div>
           <button
