@@ -1,53 +1,16 @@
+"use client";
+
 import Nav from "../components/Nav";
 import TicketQR from "./TicketQR";
-
-// ---------------------------------------------------------------------------
-// Mock data — replace with real on-chain queries once wallet connection (#1)
-// and contract integration land.
-// ---------------------------------------------------------------------------
-
-interface Ticket {
-  ticket_id: string;
-  event_id: string;
-  event_name: string;
-  tier: string;
-  redeemed: boolean;
-}
-
-// Simulates the connected wallet state. `null` = no wallet connected.
-// `""` (empty string) = wallet connected but owns no tickets.
-const MOCK_WALLET_ADDRESS: string | null =
-  "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK";
-
-const MOCK_TICKETS: Ticket[] = [
-  {
-    ticket_id: "1",
-    event_id: "42",
-    event_name: "StellarFest 2026",
-    tier: "VIP",
-    redeemed: false,
-  },
-  {
-    ticket_id: "7",
-    event_id: "42",
-    event_name: "StellarFest 2026",
-    tier: "General",
-    redeemed: true,
-  },
-  {
-    ticket_id: "3",
-    event_id: "99",
-    event_name: "Soroban Dev Day",
-    tier: "General",
-    redeemed: false,
-  },
-];
-
-// ---------------------------------------------------------------------------
+import { useWallet } from "../hooks/useWallet";
+import { useTickets } from "../hooks/useTickets";
 
 export default function TicketsPage() {
-  // No wallet connected
-  if (MOCK_WALLET_ADDRESS === null) {
+  const walletAddress = useWallet();
+  const tickets = useTickets(walletAddress);
+
+  // ── State 1: no wallet connected ─────────────────────────────────────────
+  if (walletAddress === null) {
     return (
       <div className="min-h-screen bg-slate-950 text-white">
         <Nav />
@@ -72,8 +35,6 @@ export default function TicketsPage() {
     );
   }
 
-  const tickets = MOCK_TICKETS;
-
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <Nav />
@@ -82,12 +43,12 @@ export default function TicketsPage() {
         <div className="mb-10">
           <h1 className="text-4xl font-bold mb-3">My Tickets</h1>
           <p className="text-slate-400 text-sm font-mono break-all">
-            {MOCK_WALLET_ADDRESS}
+            {walletAddress}
           </p>
         </div>
 
+        {/* ── State 2: connected but no tickets ─────────────────────────── */}
         {tickets.length === 0 ? (
-          /* Empty state */
           <div className="bg-slate-900 border border-white/10 rounded-xl p-12 text-center">
             <p className="text-4xl mb-4">🎫</p>
             <p className="text-lg font-semibold mb-2">No tickets yet</p>
@@ -96,6 +57,7 @@ export default function TicketsPage() {
             </p>
           </div>
         ) : (
+          /* ── State 3: connected with tickets ─────────────────────────── */
           <ul className="flex flex-col gap-6">
             {tickets.map((ticket) => (
               <li
