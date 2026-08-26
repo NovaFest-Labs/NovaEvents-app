@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export interface Ticket {
   ticket_id: string;
@@ -16,22 +16,13 @@ export interface Ticket {
  * Returns an empty array when `walletAddress` is `null` (no wallet connected)
  * or while the contract/API integration (issue #1) is still pending.
  *
- * Once the Soroban contract client is available, replace the TODO below with
- * a real contract call and update `tickets` with the result.
+ * TODO (issue #1): add a useEffect that calls the Soroban contract client when
+ * walletAddress is non-null and updates tickets with the result:
+ *   contractClient.getTickets({ owner: walletAddress }).then(setTickets)
  */
 export function useTickets(walletAddress: string | null): Ticket[] {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-
-  useEffect(() => {
-    if (!walletAddress) {
-      setTickets([]);
-      return;
-    }
-
-    // TODO (issue #1): fetch real tickets from the Soroban contract / API.
-    // e.g. contractClient.getTickets({ owner: walletAddress }).then(setTickets)
-    setTickets([]);
-  }, [walletAddress]);
-
+  // walletAddress is intentionally unused until issue #1 lands.
+  void walletAddress;
+  const [tickets] = useState<Ticket[]>([]);
   return tickets;
 }
