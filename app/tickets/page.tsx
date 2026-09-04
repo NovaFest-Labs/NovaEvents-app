@@ -1,6 +1,7 @@
 "use client";
 
 import Nav from "../components/Nav";
+import CopyableAddress from "../components/CopyableAddress";
 import TicketQR from "./TicketQR";
 import { useWallet } from "../hooks/useWallet";
 import { useTickets } from "../hooks/useTickets";
@@ -42,9 +43,10 @@ export default function TicketsPage() {
       <div className="max-w-3xl mx-auto px-6 py-16">
         <div className="mb-10">
           <h1 className="text-4xl font-bold mb-3">My Tickets</h1>
-          <p className="text-slate-400 text-sm font-mono break-all">
-            {walletAddress}
-          </p>
+          <CopyableAddress
+            address={walletAddress}
+            className="text-slate-400 text-sm"
+          />
         </div>
 
         {/* ── State 2: connected but no tickets ─────────────────────────── */}

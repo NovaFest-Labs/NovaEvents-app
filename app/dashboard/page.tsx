@@ -1,6 +1,7 @@
 "use client";
 
 import Nav from "../components/Nav";
+import CopyableAddress from "../components/CopyableAddress";
 import { useWallet } from "../hooks/useWallet";
 
 export default function DashboardPage() {
@@ -35,7 +36,7 @@ export default function DashboardPage() {
         ) : (
           <div className="bg-slate-900 border border-white/10 rounded-xl p-6 mb-12">
             <p className="text-slate-400 text-sm mb-1">Connected wallet</p>
-            <p className="text-sm font-mono break-all">{walletAddress}</p>
+            <CopyableAddress address={walletAddress} className="text-sm" />
           </div>
         )}
 
