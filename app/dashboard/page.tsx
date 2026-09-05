@@ -5,7 +5,7 @@ import CopyableAddress from "../components/CopyableAddress";
 import { useWallet } from "../hooks/useWallet";
 
 export default function DashboardPage() {
-  const walletAddress = useWallet();
+  const { address: walletAddress, isFreighterInstalled, isConnecting, connect } = useWallet();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -26,12 +26,24 @@ export default function DashboardPage() {
             <p className="text-slate-400 text-sm mb-6">
               Connect your Freighter wallet to create events and manage check-ins.
             </p>
-            <button
-              disabled
-              className="bg-violet-600 opacity-50 cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg"
-            >
-              Connect Wallet (coming soon)
-            </button>
+            {isFreighterInstalled ? (
+              <button
+                onClick={connect}
+                disabled={isConnecting}
+                className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+              >
+                {isConnecting ? "Connecting..." : "Connect Wallet"}
+              </button>
+            ) : (
+              <a
+                href="https://www.freighter.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-violet-600 hover:bg-violet-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+              >
+                Install Freighter
+              </a>
+            )}
           </div>
         ) : (
           <div className="bg-slate-900 border border-white/10 rounded-xl p-6 mb-12">
@@ -72,16 +84,7 @@ export default function DashboardPage() {
         </section>
 
         <p className="text-center text-slate-600 text-sm">
-          Wallet integration tracked in{" "}
-          <a
-            href="https://github.com/NovaFest-Labs/NovaEvents-app/issues/1"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-violet-500 hover:text-violet-400"
-          >
-            app issue #1
-          </a>
-          .
+          Event creation is not wired up to the contract yet.
         </p>
       </div>
     </div>
