@@ -23,6 +23,7 @@ export default function CreateEventForm({
   const [fundingGoal, setFundingGoal] = useState("");
   const [tiers, setTiers] = useState<CreateEventTierInput[]>([{ ...EMPTY_TIER }]);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const today = new Date().toISOString().slice(0, 10);
 
   function updateTier(index: number, field: keyof CreateEventTierInput, value: string) {
     setTiers((prev) =>
@@ -43,6 +44,7 @@ export default function CreateEventForm({
     if (!description.trim()) return "Description is required.";
     if (!venue.trim()) return "Venue is required.";
     if (!date) return "Date is required.";
+    if (date < today) return "Date must be today or in the future.";
     if (!fundingGoal || Number(fundingGoal) <= 0) return "Funding goal must be greater than 0.";
     if (tiers.length === 0) return "Add at least one ticket tier.";
     for (const tier of tiers) {
@@ -115,6 +117,7 @@ export default function CreateEventForm({
           <input
             id="create-event-date"
             type="date"
+            min={today}
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="bg-slate-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white"
