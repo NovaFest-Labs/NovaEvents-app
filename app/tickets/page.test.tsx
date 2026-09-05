@@ -18,6 +18,18 @@ const mockUseTickets = vi.mocked(useTickets);
 
 const STUB_ADDRESS = "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK";
 
+function walletState(overrides: Partial<ReturnType<typeof useWallet>> = {}) {
+  return {
+    address: null,
+    isFreighterInstalled: true,
+    isConnecting: false,
+    error: null,
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    ...overrides,
+  };
+}
+
 const STUB_TICKETS: Ticket[] = [
   {
     ticket_id: "1",
@@ -44,24 +56,24 @@ beforeEach(() => {
 
 describe("TicketsPage — wallet not connected", () => {
   it("shows the 'Wallet not connected' message", () => {
-    mockUseWallet.mockReturnValue(null);
+    mockUseWallet.mockReturnValue(walletState());
     mockUseTickets.mockReturnValue([]);
     render(<TicketsPage />);
 
     expect(screen.getByText("Wallet not connected")).toBeInTheDocument();
   });
 
-  it("shows the disabled Connect Wallet button", () => {
-    mockUseWallet.mockReturnValue(null);
+  it("shows an enabled Connect Wallet button when Freighter is installed", () => {
+    mockUseWallet.mockReturnValue(walletState());
     mockUseTickets.mockReturnValue([]);
     render(<TicketsPage />);
 
-    const btn = screen.getByRole("button", { name: /connect wallet/i });
-    expect(btn).toBeDisabled();
+    const btns = screen.getAllByRole("button", { name: /connect wallet/i });
+    expect(btns.some((btn) => !btn.hasAttribute("disabled"))).toBe(true);
   });
 
   it("does not show the ticket list", () => {
-    mockUseWallet.mockReturnValue(null);
+    mockUseWallet.mockReturnValue(walletState());
     mockUseTickets.mockReturnValue([]);
     render(<TicketsPage />);
 
@@ -73,7 +85,7 @@ describe("TicketsPage — wallet not connected", () => {
 
 describe("TicketsPage — connected, no tickets", () => {
   it("shows the wallet address", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue([]);
     render(<TicketsPage />);
 
@@ -81,7 +93,7 @@ describe("TicketsPage — connected, no tickets", () => {
   });
 
   it("shows the empty-state message", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue([]);
     render(<TicketsPage />);
 
@@ -89,7 +101,7 @@ describe("TicketsPage — connected, no tickets", () => {
   });
 
   it("does not show a ticket list", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue([]);
     render(<TicketsPage />);
 
@@ -101,7 +113,7 @@ describe("TicketsPage — connected, no tickets", () => {
 
 describe("TicketsPage — connected with tickets", () => {
   it("shows the wallet address", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue(STUB_TICKETS);
     render(<TicketsPage />);
 
@@ -109,7 +121,7 @@ describe("TicketsPage — connected with tickets", () => {
   });
 
   it("renders one list item per ticket", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue(STUB_TICKETS);
     render(<TicketsPage />);
 
@@ -117,7 +129,7 @@ describe("TicketsPage — connected with tickets", () => {
   });
 
   it("displays event name and tier for each ticket", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue(STUB_TICKETS);
     render(<TicketsPage />);
 
@@ -127,7 +139,7 @@ describe("TicketsPage — connected with tickets", () => {
   });
 
   it("shows 'Valid' badge for unredeemed tickets and 'Redeemed' for redeemed ones", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue(STUB_TICKETS);
     render(<TicketsPage />);
 
@@ -136,7 +148,7 @@ describe("TicketsPage — connected with tickets", () => {
   });
 
   it("does not show the empty-state message", () => {
-    mockUseWallet.mockReturnValue(STUB_ADDRESS);
+    mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     mockUseTickets.mockReturnValue(STUB_TICKETS);
     render(<TicketsPage />);
 
