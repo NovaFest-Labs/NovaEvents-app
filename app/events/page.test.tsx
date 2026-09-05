@@ -3,11 +3,14 @@ import { render, screen, cleanup } from "@testing-library/react";
 import type { EventSummary } from "../hooks/useEvents";
 
 vi.mock("../hooks/useEvents", () => ({ useEvents: vi.fn() }));
+vi.mock("../hooks/useWallet", () => ({ useWallet: vi.fn() }));
 
 import EventsPage from "./page";
 import { useEvents } from "../hooks/useEvents";
+import { useWallet } from "../hooks/useWallet";
 
 const mockUseEvents = vi.mocked(useEvents);
+const mockUseWallet = vi.mocked(useWallet);
 
 const STUB_EVENTS: EventSummary[] = [
   {
@@ -33,6 +36,14 @@ const STUB_EVENTS: EventSummary[] = [
 beforeEach(() => {
   cleanup();
   vi.clearAllMocks();
+  mockUseWallet.mockReturnValue({
+    address: null,
+    isFreighterInstalled: true,
+    isConnecting: false,
+    error: null,
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+  });
 });
 
 describe("EventsPage", () => {
