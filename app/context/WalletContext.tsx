@@ -15,6 +15,14 @@ interface WalletContextValue {
   address: string | null;
   isFreighterInstalled: boolean;
   isConnecting: boolean;
+  /**
+   * True until the initial "is Freighter already connected" check resolves.
+   * Consumers that gate access on `address` (e.g. the dashboard's
+   * redirect-if-disconnected) should wait for this to go false before
+   * deciding — otherwise an already-connected wallet flashes as
+   * disconnected during the async check.
+   */
+  isInitializing: boolean;
   error: string | null;
   connect: () => Promise<void>;
   disconnect: () => void;
@@ -26,26 +34,31 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [isFreighterInstalled, setIsFreighterInstalled] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function checkInstalledAndConnection() {
-      const connected = await isConnected();
-      if (cancelled) return;
+      try {
+        const connected = await isConnected();
+        if (cancelled) return;
 
-      if (connected.error) {
-        setIsFreighterInstalled(false);
-        return;
-      }
-      setIsFreighterInstalled(true);
-
-      if (connected.isConnected) {
-        const result = await getAddress();
-        if (!cancelled && !result.error && result.address) {
-          setAddress(result.address);
+        if (connected.error) {
+          setIsFreighterInstalled(false);
+          return;
         }
+        setIsFreighterInstalled(true);
+
+        if (connected.isConnected) {
+          const result = await getAddress();
+          if (!cancelled && !result.error && result.address) {
+            setAddress(result.address);
+          }
+        }
+      } finally {
+        if (!cancelled) setIsInitializing(false);
       }
     }
 
@@ -75,8 +88,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ address, isFreighterInstalled, isConnecting, error, connect, disconnect }),
-    [address, isFreighterInstalled, isConnecting, error, connect, disconnect]
+    () => ({
+      address,
+      isFreighterInstalled,
+      isConnecting,
+      isInitializing,
+      error,
+      connect,
+      disconnect,
+    }),
+    [address, isFreighterInstalled, isConnecting, isInitializing, error, connect, disconnect]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;

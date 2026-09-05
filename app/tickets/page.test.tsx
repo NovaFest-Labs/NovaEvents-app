@@ -23,6 +23,7 @@ function walletState(overrides: Partial<ReturnType<typeof useWallet>> = {}) {
     address: null,
     isFreighterInstalled: true,
     isConnecting: false,
+    isInitializing: false,
     error: null,
     connect: vi.fn(),
     disconnect: vi.fn(),
