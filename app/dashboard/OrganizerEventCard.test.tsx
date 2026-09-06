@@ -35,4 +35,18 @@ describe("OrganizerEventCard", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
   });
+
+  it("does not render the camera scanner until 'Scan QR' is clicked", () => {
+    render(<OrganizerEventCard event={STUB_EVENT} />);
+    expect(screen.queryByLabelText(/Camera preview/)).not.toBeInTheDocument();
+  });
+
+  it("shows the scanner's camera-unavailable fallback when opened in a camera-less environment", async () => {
+    render(<OrganizerEventCard event={STUB_EVENT} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Scan QR" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/Enter the ticket ID manually/);
+    expect(screen.getByRole("button", { name: "Close scanner" })).toBeInTheDocument();
+  });
 });
