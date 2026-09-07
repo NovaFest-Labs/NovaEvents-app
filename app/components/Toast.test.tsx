@@ -1,9 +1,14 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Toast } from "./Toast";
 
 describe("Toast", () => {
+  beforeEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
   it("renders success toast with correct message", () => {
     const onClose = vi.fn();
     render(
@@ -33,7 +38,9 @@ describe("Toast", () => {
     );
 
     expect(screen.getByText("Error message")).toBeInTheDocument();
-    expect(screen.getByText("✕")).toBeInTheDocument();
+    // The ✕ icon appears in both the icon span and the close button — grab the icon span
+    const icons = screen.getAllByText("✕");
+    expect(icons.length).toBeGreaterThanOrEqual(1);
   });
 
   it("calls onClose when close button is clicked", async () => {

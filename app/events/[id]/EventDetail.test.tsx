@@ -4,6 +4,8 @@ import type { EventDetail as EventDetailData } from "../../hooks/useEvent";
 
 vi.mock("../../hooks/useEvent", () => ({ useEvent: vi.fn() }));
 vi.mock("../../hooks/useWallet", () => ({ useWallet: vi.fn() }));
+vi.mock("../../context/ToastContext", () => ({ useToast: vi.fn() }));
+vi.mock("../../components/Nav", () => ({ default: () => null }));
 
 import EventDetail from "./EventDetail";
 import { useEvent } from "../../hooks/useEvent";
