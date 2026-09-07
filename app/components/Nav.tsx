@@ -2,24 +2,37 @@
 
 import Link from "next/link";
 import { useWallet } from "../hooks/useWallet";
+import { useToast } from "../context/ToastContext";
+import { useEffect } from "react";
 
 function shortenAddress(address: string): string {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
 function WalletControl() {
-  const { address, isFreighterInstalled, isConnecting, connect, disconnect } = useWallet();
+  const { address, isFreighterInstalled, isConnecting, connect, disconnect, error } = useWallet();
+  const { showToast } = useToast();
+
+  // Show error toast when wallet connection fails
+  useEffect(() => {
+    if (error) {
+      showToast(error, "error", 7000);
+    }
+  }, [error, showToast]);
 
   if (!isFreighterInstalled) {
     return (
-      <a
-        href="https://www.freighter.app/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm text-violet-500 hover:text-violet-400 transition-colors"
-      >
-        Install Freighter
-      </a>
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-slate-500">Freighter not found</span>
+        <a
+          href="https://www.freighter.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-violet-500 hover:text-violet-400 transition-colors font-medium"
+        >
+          Install Freighter ↗
+        </a>
+      </div>
     );
   }
 
