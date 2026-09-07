@@ -5,6 +5,8 @@ import type { Ticket } from "../hooks/useTickets";
 // ── module-level mocks (hoisted before imports of the component) ─────────────
 vi.mock("../hooks/useWallet", () => ({ useWallet: vi.fn() }));
 vi.mock("../hooks/useTickets", () => ({ useTickets: vi.fn() }));
+vi.mock("../context/ToastContext", () => ({ useToast: vi.fn() }));
+vi.mock("../components/Nav", () => ({ default: () => null }));
 
 // import AFTER mocks are set up
 import TicketsPage from "./page";

@@ -4,6 +4,8 @@ import type { OrganizerEvent } from "../hooks/useOrganizerEvents";
 
 vi.mock("../hooks/useWallet", () => ({ useWallet: vi.fn() }));
 vi.mock("../hooks/useOrganizerEvents", () => ({ useOrganizerEvents: vi.fn() }));
+vi.mock("../context/ToastContext", () => ({ useToast: vi.fn() }));
+vi.mock("../components/Nav", () => ({ default: () => null }));
 
 const mockReplace = vi.fn();
 vi.mock("next/navigation", () => ({

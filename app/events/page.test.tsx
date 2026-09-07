@@ -4,6 +4,8 @@ import type { EventSummary } from "../hooks/useEvents";
 
 vi.mock("../hooks/useEvents", () => ({ useEvents: vi.fn() }));
 vi.mock("../hooks/useWallet", () => ({ useWallet: vi.fn() }));
+vi.mock("../context/ToastContext", () => ({ useToast: vi.fn() }));
+vi.mock("../components/Nav", () => ({ default: () => null }));
 
 import EventsPage from "./page";
 import { useEvents } from "../hooks/useEvents";
