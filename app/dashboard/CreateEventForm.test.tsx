@@ -51,6 +51,15 @@ describe("CreateEventForm", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Event name is required.");
   });
 
+  it("rejects a date in the past", () => {
+    render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+    fillRequiredFields();
+    fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2000-01-01" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Date must be today or in the future.");
+  });
+
   it("submits and shows the not-wired-up-yet error once all fields are valid", async () => {
     render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
     fillRequiredFields();
