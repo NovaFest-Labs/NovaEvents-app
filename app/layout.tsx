@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "./context/WalletContext";
+import { ToastProvider } from "./context/ToastContext";
+import { ToastContainer } from "./components/ToastContainer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +47,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <WalletProvider>{children}</WalletProvider>
+        <ToastProvider>
+          <WalletProvider>
+            <ToastContainer />
+            {children}
+          </WalletProvider>
+        </ToastProvider>
       </body>
     </html>
   );
