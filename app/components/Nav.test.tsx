@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Nav from "./Nav";
+import { useWallet } from "../hooks/useWallet";
 
 // Mock next/link
 vi.mock("next/link", () => ({
@@ -27,8 +28,7 @@ describe("Nav - Freighter Detection", () => {
   });
 
   it("shows Install Freighter link when extension not installed", () => {
-    const { useWallet } = require("../hooks/useWallet");
-    useWallet.mockReturnValue({
+    vi.mocked(useWallet).mockReturnValue({
       address: null,
       isFreighterInstalled: false,
       isConnecting: false,
@@ -46,8 +46,7 @@ describe("Nav - Freighter Detection", () => {
   });
 
   it("shows Connect Wallet button when Freighter installed and wallet disconnected", () => {
-    const { useWallet } = require("../hooks/useWallet");
-    useWallet.mockReturnValue({
+    vi.mocked(useWallet).mockReturnValue({
       address: null,
       isFreighterInstalled: true,
       isConnecting: false,
@@ -62,8 +61,7 @@ describe("Nav - Freighter Detection", () => {
   });
 
   it("shows wallet address and disconnect button when connected", () => {
-    const { useWallet } = require("../hooks/useWallet");
-    useWallet.mockReturnValue({
+    vi.mocked(useWallet).mockReturnValue({
       address: "GBUQWP3BOUZX34ULNQG23RQ6F4PFXJJEFVXM5VCCCM監察QVXN7U2TGZL",
       isFreighterInstalled: true,
       isConnecting: false,
@@ -79,8 +77,7 @@ describe("Nav - Freighter Detection", () => {
   });
 
   it("shows Connecting state when wallet is connecting", () => {
-    const { useWallet } = require("../hooks/useWallet");
-    useWallet.mockReturnValue({
+    vi.mocked(useWallet).mockReturnValue({
       address: null,
       isFreighterInstalled: true,
       isConnecting: true,
