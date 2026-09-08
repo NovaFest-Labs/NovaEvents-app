@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getApiBaseUrl } from "../lib/env";
 
 export interface EventSummary {
   id: string;
@@ -30,7 +31,7 @@ export function useEvents(): UseEventsResult {
 
   useEffect(() => {
     const controller = new AbortController();
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+    const baseUrl = getApiBaseUrl();
 
     async function fetchEvents() {
       setLoading(true);

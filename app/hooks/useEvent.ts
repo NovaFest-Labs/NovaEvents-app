@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getApiBaseUrl } from "../lib/env";
 
 export interface TicketTier {
   id: string;
@@ -49,7 +50,7 @@ export function useEvent(id: string): UseEventResult {
 
   useEffect(() => {
     const controller = new AbortController();
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+    const baseUrl = getApiBaseUrl();
 
     async function fetchEvent() {
       setLoading(true);
