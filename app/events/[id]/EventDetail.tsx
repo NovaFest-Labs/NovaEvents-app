@@ -7,13 +7,17 @@ import CopyableAddress from "../../components/CopyableAddress";
 import { useWallet } from "../../hooks/useWallet";
 import { useEvent, type TicketTier } from "../../hooks/useEvent";
 import { formatUsdc } from "../../lib/formatUsdc";
+import { useToast } from "../../context/ToastContext";
+import { useSponsorEvent, MAX_USDC } from "../../hooks/useSponsorEvent";
 
 const NOT_WIRED_UP_MESSAGE =
   "This isn't wired up to the contract yet — see issue #1.";
 
+// ─── Skeleton / error states ──────────────────────────────────────────────────
+
 function EventSkeleton() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
       <div
         role="status"
         aria-live="polite"
@@ -90,7 +94,7 @@ function EventSkeleton() {
 
 function EventNotFound({ id }: { id: string }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-24 text-center">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-24 text-center">
       <p className="text-violet-500 font-mono font-bold text-sm mb-4">404</p>
       <h1 className="text-4xl font-bold mb-4">Event not found</h1>
       <p className="text-slate-400 mb-10 max-w-sm mx-auto">
@@ -110,7 +114,7 @@ function EventNotFound({ id }: { id: string }) {
 
 function EventError({ message }: { message: string }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-24 text-center">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-24 text-center">
       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-10">
         <p className="text-red-300 font-medium mb-2">
           Couldn&apos;t load this event
@@ -120,6 +124,8 @@ function EventError({ message }: { message: string }) {
     </div>
   );
 }
+
+// ─── Buy Ticket ───────────────────────────────────────────────────────────────
 
 function BuyTicketButton({
   tier,
@@ -150,23 +156,136 @@ function BuyTicketButton({
       >
         {soldOut ? "Sold out" : "Buy Ticket"}
       </button>
-      {message && <p className="text-xs text-slate-500 max-w-[16rem] text-right">{message}</p>}
+      {message && (
+        <p className="text-xs text-slate-500 max-w-[16rem] text-right">
+          {message}
+        </p>
+      )}
     </div>
   );
 }
 
-function SponsorPanel({ walletConnected }: { walletConnected: boolean }) {
-  const [amount, setAmount] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
-  const disabled = !walletConnected;
+// ─── Sponsor Panel ────────────────────────────────────────────────────────────
 
-  function handleSponsor() {
-    // TODO (issue #1): call the Soroban contract client's sponsor
-    // entrypoint once the contract integration lands, e.g.
-    //   await contractClient.sponsor({ amount, sponsor: walletAddress })
-    setMessage(NOT_WIRED_UP_MESSAGE);
+/** Client-side validation for the raw USDC amount string. */
+function validateAmount(raw: string): string | null {
+  if (!raw || raw.trim() === "") return "Please enter an amount.";
+  const n = parseFloat(raw);
+  if (isNaN(n) || n <= 0) return "Amount must be greater than 0.";
+  if (n > MAX_USDC)
+    return `Amount cannot exceed ${MAX_USDC.toLocaleString()} USDC.`;
+  return null;
+}
+
+interface SponsorPanelProps {
+  eventId: string;
+  walletConnected: boolean;
+  walletAddress: string | null;
+  onSuccess: () => void;
+}
+
+function SponsorPanel({
+  eventId,
+  walletConnected,
+  walletAddress,
+  onSuccess,
+}: SponsorPanelProps) {
+  const { showToast } = useToast();
+  const { status, error, confirm, cancel, submit, stagedAmount, reset } =
+    useSponsorEvent();
+  const [amount, setAmount] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const disabled = !walletConnected;
+  const isPending = status === "pending";
+
+  // Derive a stable "handled" marker so we only fire toast + side-effects once
+  // per terminal state transition.
+  const [handledStatus, setHandledStatus] = useState<typeof status>("idle");
+  if (
+    status !== handledStatus &&
+    (status === "success" || status === "error")
+  ) {
+    setHandledStatus(status);
+    if (status === "success") {
+      const formatted = parseFloat(stagedAmount).toLocaleString(undefined, {
+        maximumFractionDigits: 7,
+      });
+      showToast(`Sponsored ${formatted} USDC — thank you!`, "success");
+      setAmount("");
+      onSuccess();
+      setTimeout(reset, 100); // let the toast render before clearing panel state
+    } else {
+      showToast(
+        error ?? "Sponsorship failed — please try again.",
+        "error"
+      );
+      // Stay on the confirmation step so the user can retry without
+      // re-entering their amount.
+    }
   }
 
+  function handleConfirm() {
+    setValidationError(null);
+    const err = validateAmount(amount);
+    if (err) {
+      setValidationError(err);
+      return;
+    }
+    confirm(amount);
+  }
+
+  function handleCancel() {
+    cancel();
+    setValidationError(null);
+  }
+
+  // ── Confirmation / pending step ──────────────────────────────────────────
+  if (status === "confirming" || isPending) {
+    return (
+      <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
+        <p className="text-slate-400 text-sm mb-4">Confirm sponsorship</p>
+
+        <div className="bg-slate-800 rounded-lg px-4 py-3 mb-4">
+          <p className="text-xs text-slate-400 mb-1">Amount</p>
+          <p className="text-xl font-semibold">
+            {parseFloat(stagedAmount).toLocaleString(undefined, {
+              maximumFractionDigits: 7,
+            })}{" "}
+            USDC
+          </p>
+        </div>
+
+        <p className="text-slate-400 text-xs mb-5 leading-relaxed">
+          By confirming you authorise this USDC contribution to be recorded
+          on-chain against this event.
+        </p>
+
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              void submit(eventId, walletAddress!);
+            }}
+            disabled={isPending}
+            className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+          >
+            {isPending ? "Submitting…" : "Confirm & Sponsor"}
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            disabled={isPending}
+            className="px-4 py-2.5 text-sm text-slate-400 hover:text-white border border-white/10 rounded-lg transition-colors disabled:opacity-40"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Amount-input step ────────────────────────────────────────────────────
   return (
     <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
       <p className="text-slate-400 text-sm mb-3">Sponsor this event</p>
@@ -177,18 +296,22 @@ function SponsorPanel({ walletConnected }: { walletConnected: boolean }) {
         <input
           id="sponsor-amount"
           type="number"
-          min="0"
+          min="0.0000001"
+          max={MAX_USDC}
           step="0.0000001"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => {
+            setAmount(e.target.value);
+            if (validationError) setValidationError(null);
+          }}
           disabled={disabled}
           placeholder="Amount (USDC)"
           title={disabled ? "Connect wallet to continue" : undefined}
-          className="flex-1 min-w-0 bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white disabled:opacity-40"
+          className="flex-1 min-w-0 bg-slate-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-600 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
         />
         <button
           type="button"
-          onClick={handleSponsor}
+          onClick={handleConfirm}
           disabled={disabled || !amount}
           title={disabled ? "Connect wallet to continue" : undefined}
           className="bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
@@ -196,17 +319,30 @@ function SponsorPanel({ walletConnected }: { walletConnected: boolean }) {
           Sponsor
         </button>
       </div>
-      {message && <p className="text-xs text-slate-500 mt-2">{message}</p>}
+      {validationError && (
+        <p role="alert" className="text-xs text-red-400 mt-2">
+          {validationError}
+        </p>
+      )}
+      {!walletConnected && (
+        <p className="text-xs text-slate-500 mt-2">
+          Connect your wallet to sponsor this event.
+        </p>
+      )}
     </div>
   );
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function shortenAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-6)}`;
 }
 
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function EventDetail({ id }: { id: string }) {
-  const { event, loading, error, notFound } = useEvent(id);
+  const { event, loading, error, notFound, refetch } = useEvent(id);
   const { address: walletAddress } = useWallet();
   const walletConnected = walletAddress !== null;
 
@@ -221,10 +357,11 @@ export default function EventDetail({ id }: { id: string }) {
       {!loading && !notFound && error && <EventError message={error} />}
 
       {!loading && !notFound && !error && event && (
-        <div className="max-w-5xl mx-auto px-6 py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          {/* ── Event header ──────────────────────────────────────────── */}
           <div className="mb-10">
-            <div className="flex items-center gap-3 mb-3">
-              <h1 className="text-4xl font-bold">{event.name}</h1>
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              <h1 className="text-3xl sm:text-4xl font-bold">{event.name}</h1>
               <span className="text-xs font-semibold uppercase tracking-wide bg-violet-600/20 text-violet-300 border border-violet-500/30 rounded-full px-3 py-1">
                 {event.status}
               </span>
@@ -241,7 +378,9 @@ export default function EventDetail({ id }: { id: string }) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* ── Left / main column ──────────────────────────────────── */}
             <div className="lg:col-span-2 space-y-8">
+              {/* Ticket Tiers */}
               <section>
                 <h2 className="text-xl font-semibold mb-4">Ticket Tiers</h2>
                 {event.tiers.length === 0 ? (
@@ -255,8 +394,8 @@ export default function EventDetail({ id }: { id: string }) {
                         key={tier.id}
                         className="bg-slate-900 border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
                       >
-                        <div>
-                          <p className="font-medium">{tier.name}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{tier.name}</p>
                           <p className="text-slate-400 text-sm">
                             {formatUsdc(tier.price)} ·{" "}
                             {tier.tickets_sold} / {tier.supply_cap} sold
@@ -272,7 +411,8 @@ export default function EventDetail({ id }: { id: string }) {
                 )}
               </section>
 
-              <section>
+              {/* Sponsorships list */}
+              <section aria-live="polite" aria-label="Sponsorships">
                 <h2 className="text-xl font-semibold mb-4">Sponsorships</h2>
                 {event.sponsorships.length === 0 ? (
                   <p className="text-slate-500 text-sm">
@@ -284,7 +424,9 @@ export default function EventDetail({ id }: { id: string }) {
                       <thead>
                         <tr className="border-b border-white/10 text-left text-slate-400">
                           <th className="p-4 font-medium">Sponsor</th>
-                          <th className="p-4 font-medium text-right">Amount</th>
+                          <th className="p-4 font-medium text-right">
+                            Amount
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -297,10 +439,10 @@ export default function EventDetail({ id }: { id: string }) {
                                 : ""
                             }
                           >
-                            <td className="p-4 font-mono text-slate-300">
+                            <td className="p-4 font-mono text-slate-300 break-all">
                               {shortenAddress(sponsorship.sponsor_address)}
                             </td>
-                            <td className="p-4 text-right">
+                            <td className="p-4 text-right whitespace-nowrap">
                               {formatUsdc(sponsorship.amount)}
                             </td>
                           </tr>
@@ -312,7 +454,9 @@ export default function EventDetail({ id }: { id: string }) {
               </section>
             </div>
 
+            {/* ── Right / sidebar column ──────────────────────────────── */}
             <div className="space-y-6">
+              {/* Funding summary */}
               <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
                 <p className="text-slate-400 text-sm mb-1">Funding</p>
                 <p className="text-2xl font-bold mb-1">
@@ -328,7 +472,13 @@ export default function EventDetail({ id }: { id: string }) {
                 />
               </div>
 
-              <SponsorPanel walletConnected={walletConnected} />
+              {/* Sponsor panel — wired to hook + toast + refetch */}
+              <SponsorPanel
+                eventId={id}
+                walletConnected={walletConnected}
+                walletAddress={walletAddress}
+                onSuccess={refetch}
+              />
             </div>
           </div>
         </div>
