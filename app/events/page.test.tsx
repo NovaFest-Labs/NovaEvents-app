@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import type { EventSummary } from "../hooks/useEvents";
 
 vi.mock("../hooks/useEvents", () => ({ useEvents: vi.fn() }));
@@ -51,14 +51,14 @@ beforeEach(() => {
 
 describe("EventsPage", () => {
   it("shows a loading state", () => {
-    mockUseEvents.mockReturnValue({ events: [], loading: true, error: null });
+    mockUseEvents.mockReturnValue({ events: [], loading: true, error: null, retry: vi.fn() });
     render(<EventsPage />);
 
     expect(screen.getByLabelText("Loading events")).toBeInTheDocument();
   });
 
   it("shows an empty state when there are no events", () => {
-    mockUseEvents.mockReturnValue({ events: [], loading: false, error: null });
+    mockUseEvents.mockReturnValue({ events: [], loading: false, error: null, retry: vi.fn() });
     render(<EventsPage />);
 
     expect(screen.getByText("No events yet")).toBeInTheDocument();
@@ -69,14 +69,31 @@ describe("EventsPage", () => {
       events: [],
       loading: false,
       error: "Failed to fetch events (500)",
+      retry: vi.fn(),
     });
     render(<EventsPage />);
 
     expect(screen.getByText("Couldn't load events")).toBeInTheDocument();
   });
 
+  it("shows a Retry button in the error state and calls retry when clicked", () => {
+    const retry = vi.fn();
+    mockUseEvents.mockReturnValue({
+      events: [],
+      loading: false,
+      error: "Failed to fetch events (500)",
+      retry,
+    });
+    render(<EventsPage />);
+
+    const retryButton = screen.getByRole("button", { name: /retry/i });
+    expect(retryButton).toBeInTheDocument();
+    fireEvent.click(retryButton);
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
   it("renders one card per event with a link to its detail page", () => {
-    mockUseEvents.mockReturnValue({ events: STUB_EVENTS, loading: false, error: null });
+    mockUseEvents.mockReturnValue({ events: STUB_EVENTS, loading: false, error: null, retry: vi.fn() });
     render(<EventsPage />);
 
     expect(screen.getByText("StellarFest 2026")).toBeInTheDocument();
@@ -91,7 +108,7 @@ describe("EventsPage", () => {
   });
 
   it("displays venue, tier count, and funding progress for each event", () => {
-    mockUseEvents.mockReturnValue({ events: STUB_EVENTS, loading: false, error: null });
+    mockUseEvents.mockReturnValue({ events: STUB_EVENTS, loading: false, error: null, retry: vi.fn() });
     render(<EventsPage />);
 
     expect(screen.getByText(/The Grand Hall/)).toBeInTheDocument();

@@ -17,17 +17,20 @@ interface UseEventsResult {
   events: EventSummary[];
   loading: boolean;
   error: string | null;
+  retry: () => void;
 }
 
 /**
  * Fetches the list of active events from the API.
  *
  * The API base URL comes from NEXT_PUBLIC_API_URL — see .env.example.
+ * Call the returned `retry` function to re-trigger the fetch after an error.
  */
 export function useEvents(): UseEventsResult {
   const [events, setEvents] = useState<EventSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -55,7 +58,9 @@ export function useEvents(): UseEventsResult {
 
     fetchEvents();
     return () => controller.abort();
-  }, []);
+  }, [retryCount]);
 
-  return { events, loading, error };
+  const retry = () => setRetryCount((c) => c + 1);
+
+  return { events, loading, error, retry };
 }
