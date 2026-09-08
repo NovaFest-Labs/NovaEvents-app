@@ -35,6 +35,8 @@ interface UseEventResult {
   loading: boolean;
   error: string | null;
   notFound: boolean;
+  /** Re-fetch the event without a full page reload (e.g. after a sponsorship). */
+  refetch: () => void;
 }
 
 /**
@@ -47,16 +49,23 @@ export function useEvent(id: string): UseEventResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [epoch, setEpoch] = useState(0);
+
+  /** Increment epoch to trigger a re-fetch while keeping the stale data visible. */
+  function refetch() {
+    setEpoch((e) => e + 1);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
     const baseUrl = getApiBaseUrl();
 
     async function fetchEvent() {
-      setLoading(true);
+      // Only show the full loading state on the initial load; subsequent
+      // refetches keep the stale event data visible so the UI doesn't flicker.
+      if (epoch === 0) setLoading(true);
       setError(null);
       setNotFound(false);
-      setEvent(null);
       try {
         const response = await fetch(`${baseUrl}/api/events/${id}`, {
           signal: controller.signal,
@@ -80,7 +89,7 @@ export function useEvent(id: string): UseEventResult {
 
     fetchEvent();
     return () => controller.abort();
-  }, [id]);
+  }, [id, epoch]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { event, loading, error, notFound };
+  return { event, loading, error, notFound, refetch };
 }
