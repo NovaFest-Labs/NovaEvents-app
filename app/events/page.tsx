@@ -30,7 +30,7 @@ function LoadingGrid() {
 }
 
 export default function EventsPage() {
-  const { events, loading, error } = useEvents();
+  const { events, loading, error, retry } = useEvents();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -52,7 +52,13 @@ export default function EventsPage() {
             <p className="text-red-300 font-medium mb-2">
               Couldn&apos;t load events
             </p>
-            <p className="text-slate-400 text-sm">{error}</p>
+            <p className="text-slate-400 text-sm mb-6">{error}</p>
+            <button
+              onClick={retry}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
+            >
+              Retry
+            </button>
           </div>
         )}
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useEvents } from "./useEvents";
 
 const STUB_RESPONSE = [
@@ -56,5 +56,31 @@ describe("useEvents", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toMatch(/500/);
     expect(result.current.events).toEqual([]);
+  });
+
+  it("re-fetches when retry is called", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        json: async () => ({}),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => STUB_RESPONSE,
+      } as Response);
+
+    const { result } = renderHook(() => useEvents());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toMatch(/503/);
+
+    act(() => {
+      result.current.retry();
+    });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeNull();
+    expect(result.current.events).toEqual(STUB_RESPONSE);
   });
 });
