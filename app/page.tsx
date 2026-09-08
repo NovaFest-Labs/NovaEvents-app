@@ -7,7 +7,7 @@ export default function Home() {
       <Nav />
 
       {/* Hero */}
-      <section className="px-6 py-28 text-center max-w-4xl mx-auto">
+      <section className="px-4 sm:px-6 py-20 sm:py-28 text-center max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-4 py-1.5 text-sm text-violet-400 mb-8">
           Built on Stellar · Powered by Soroban
         </div>
@@ -40,9 +40,9 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="px-6 py-20 border-t border-white/10">
+      <section className="px-4 sm:px-6 py-16 sm:py-20 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Why on-chain?</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">Why on-chain?</h2>
           <p className="text-slate-400 text-center mb-14 max-w-xl mx-auto">
             Moving the full money flow on-chain turns an event into a
             transparent, auditable process.
@@ -65,9 +65,9 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="px-6 py-20 border-t border-white/10">
+      <section className="px-4 sm:px-6 py-16 sm:py-20 border-t border-white/10">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">How it works</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">How it works</h2>
           <p className="text-slate-400 text-center mb-14">
             Three steps for organizers.
           </p>
@@ -86,9 +86,9 @@ export default function Home() {
       </section>
 
       {/* Open source banner */}
-      <section className="px-6 py-20 bg-violet-600/10 border-t border-violet-500/20">
+      <section className="px-4 sm:px-6 py-16 sm:py-20 bg-violet-600/10 border-t border-violet-500/20">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
             Open source. Open to contributors.
           </h2>
           <p className="text-slate-400 mb-8 leading-relaxed">
@@ -109,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 px-6 py-8">
+      <footer className="border-t border-white/10 px-4 sm:px-6 py-8">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
           <span>NovaEvents — MIT License</span>
           <span>Built on Stellar · Settled in USDC</span>

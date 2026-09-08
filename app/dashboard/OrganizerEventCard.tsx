@@ -27,8 +27,8 @@ export default function OrganizerEventCard({ event }: { event: OrganizerEvent })
 
   return (
     <div className="bg-slate-900 border border-white/10 rounded-xl p-6">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div>
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <div className="min-w-0">
           <Link
             href={`/events/${event.id}`}
             className="font-semibold text-lg hover:text-violet-400 transition-colors"
