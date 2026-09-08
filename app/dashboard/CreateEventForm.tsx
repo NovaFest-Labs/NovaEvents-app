@@ -189,7 +189,7 @@ export default function CreateEventForm({
                 onClick={() => removeTier(i)}
                 disabled={tiers.length === 1}
                 aria-label={`Remove tier ${i + 1}`}
-                className="text-slate-500 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed text-sm px-2 py-2"
+                className="sm:self-end text-slate-500 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed text-sm px-2 py-2"
               >
                 Remove
               </button>

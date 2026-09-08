@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import Nav from "./Nav";
 import { useWallet } from "../hooks/useWallet";
 import { useToast } from "../context/ToastContext";
@@ -23,6 +23,7 @@ vi.mock("../context/ToastContext", () => ({
 
 describe("Nav - Freighter Detection", () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
     // Restore useToast default implementation after clearAllMocks wipes it
     vi.mocked(useToast).mockReturnValue({
@@ -37,6 +38,7 @@ describe("Nav - Freighter Detection", () => {
       address: null,
       isFreighterInstalled: false,
       isConnecting: false,
+      isInitializing: false,
       error: null,
       connect: vi.fn(),
       disconnect: vi.fn(),
@@ -44,10 +46,13 @@ describe("Nav - Freighter Detection", () => {
 
     render(<Nav />);
 
-    expect(screen.getByText(/Freighter not found/i)).toBeInTheDocument();
-    const freighterLink = screen.getByRole("link", { name: /Install Freighter/i });
-    expect(freighterLink).toHaveAttribute("href", "https://www.freighter.app/");
-    expect(freighterLink).toHaveAttribute("target", "_blank");
+    // WalletControl renders in both the desktop and mobile slots — at least
+    // one instance of each element must be present.
+    expect(screen.getAllByText(/Freighter not found/i).length).toBeGreaterThan(0);
+    const freighterLinks = screen.getAllByRole("link", { name: /Install Freighter/i });
+    expect(freighterLinks.length).toBeGreaterThan(0);
+    expect(freighterLinks[0]).toHaveAttribute("href", "https://www.freighter.app/");
+    expect(freighterLinks[0]).toHaveAttribute("target", "_blank");
   });
 
   it("shows Connect Wallet button when Freighter installed and wallet disconnected", () => {
@@ -55,6 +60,7 @@ describe("Nav - Freighter Detection", () => {
       address: null,
       isFreighterInstalled: true,
       isConnecting: false,
+      isInitializing: false,
       error: null,
       connect: vi.fn(),
       disconnect: vi.fn(),
@@ -62,7 +68,9 @@ describe("Nav - Freighter Detection", () => {
 
     render(<Nav />);
 
-    expect(screen.getByRole("button", { name: /Connect Wallet/i })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("button", { name: /Connect Wallet/i }).length
+    ).toBeGreaterThan(0);
   });
 
   it("shows wallet address and disconnect button when connected", () => {
@@ -70,6 +78,7 @@ describe("Nav - Freighter Detection", () => {
       address: "GBUQWP3BOUZX34ULNQG23RQ6F4PFXJJEFVXM5VCCCMQVXN7U2TGZL",
       isFreighterInstalled: true,
       isConnecting: false,
+      isInitializing: false,
       error: null,
       connect: vi.fn(),
       disconnect: vi.fn(),
@@ -77,8 +86,10 @@ describe("Nav - Freighter Detection", () => {
 
     render(<Nav />);
 
-    expect(screen.getByText(/GBUQ\.\.\.TGZL/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Disconnect/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/GBUQ\.\.\.TGZL/).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole("button", { name: /Disconnect/i }).length
+    ).toBeGreaterThan(0);
   });
 
   it("shows Connecting state when wallet is connecting", () => {
@@ -86,6 +97,7 @@ describe("Nav - Freighter Detection", () => {
       address: null,
       isFreighterInstalled: true,
       isConnecting: true,
+      isInitializing: false,
       error: null,
       connect: vi.fn(),
       disconnect: vi.fn(),
@@ -93,6 +105,8 @@ describe("Nav - Freighter Detection", () => {
 
     render(<Nav />);
 
-    expect(screen.getByRole("button", { name: /Connecting.../i })).toBeInTheDocument();
+    const connectingButtons = screen.getAllByRole("button", { name: /Connecting.../i });
+    expect(connectingButtons.length).toBeGreaterThan(0);
+    expect(connectingButtons[0]).toBeDisabled();
   });
 });

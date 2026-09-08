@@ -36,9 +36,9 @@ export default function EventsPage() {
     <div className="min-h-screen bg-slate-950 text-white">
       <Nav />
 
-      <div className="max-w-6xl mx-auto px-6 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-3">Events</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">Events</h1>
           <p className="text-slate-400">
             All events are settled on Stellar. Ticket sales, sponsorships, and
             payouts are publicly verifiable.

@@ -15,8 +15,8 @@ export default function TicketsPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-white">
         <Nav />
-        <div className="max-w-3xl mx-auto px-6 py-16 text-center">
-          <h1 className="text-4xl font-bold mb-4">My Tickets</h1>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4">My Tickets</h1>
           <div className="bg-violet-600/10 border border-violet-500/20 rounded-xl p-10 mt-8">
             <p className="text-violet-300 font-medium mb-2">
               Wallet not connected
@@ -52,9 +52,9 @@ export default function TicketsPage() {
     <div className="min-h-screen bg-slate-950 text-white">
       <Nav />
 
-      <div className="max-w-3xl mx-auto px-6 py-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-3">My Tickets</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">My Tickets</h1>
           <CopyableAddress
             address={walletAddress}
             className="text-slate-400 text-sm"
@@ -78,7 +78,7 @@ export default function TicketsPage() {
                 key={`${ticket.event_id}-${ticket.ticket_id}`}
                 className="bg-slate-900 border border-white/10 rounded-xl p-6"
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h2 className="font-semibold text-lg mb-1">
                       {ticket.event_name}
