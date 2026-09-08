@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { getApiBaseUrl } from "../lib/env";
 
 export interface OrganizerEvent {
   id: string;
@@ -33,7 +34,7 @@ export function useOrganizerEvents(organizerAddress: string | null): UseOrganize
     }
 
     const controller = new AbortController();
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "";
+    const baseUrl = getApiBaseUrl();
 
     async function fetchOrganizerEvents() {
       setLoading(true);
