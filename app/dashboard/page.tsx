@@ -76,6 +76,13 @@ export default function DashboardPage() {
                 Couldn&apos;t load your events
               </p>
               <p className="text-slate-400 text-sm">{error}</p>
+              <button
+                type="button"
+                onClick={refetch}
+                className="mt-5 rounded-lg bg-red-400/10 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-400/20"
+              >
+                Retry
+              </button>
             </div>
           )}
 
