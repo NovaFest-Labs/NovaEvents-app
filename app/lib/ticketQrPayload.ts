@@ -32,7 +32,8 @@ export function parseTicketQrPayload(raw: string): TicketQrPayload | null {
     typeof issued_at !== "string" ||
     !event_id ||
     !ticket_id ||
-    !owner
+    !owner ||
+    !issued_at
   ) {
     return null;
   }

@@ -27,6 +27,10 @@ describe("parseTicketQrPayload", () => {
     expect(parseTicketQrPayload(JSON.stringify({ ...VALID, ticket_id: "" }))).toBeNull();
   });
 
+  it("returns null when issued_at is an empty string", () => {
+    expect(parseTicketQrPayload(JSON.stringify({ ...VALID, issued_at: "" }))).toBeNull();
+  });
+
   it("returns null for a JSON value that isn't an object", () => {
     expect(parseTicketQrPayload(JSON.stringify("hello"))).toBeNull();
   });
