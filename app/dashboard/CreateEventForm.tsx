@@ -64,7 +64,20 @@ export default function CreateEventForm({
     setValidationError(validationMessage);
     if (validationMessage) return;
 
-    await createEvent({ name, description, venue, date, fundingGoal, tiers });
+    const trimmedTiers = tiers.map((tier) => ({
+      name: tier.name.trim(),
+      price: tier.price.trim(),
+      supplyCap: tier.supplyCap.trim(),
+    }));
+
+    await createEvent({ 
+      name: name.trim(),
+      description: description.trim(),
+      venue: venue.trim(),
+      date,
+      fundingGoal: fundingGoal.trim(),
+      tiers: trimmedTiers,
+    });
     onCreated?.();
   }
 

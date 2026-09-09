@@ -1,11 +1,13 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import CreateEventForm from "./CreateEventForm";
+import * as useCreateEventModule from "../hooks/useCreateEvent";
 
 const STUB_ADDRESS = "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK";
 
 beforeEach(() => {
   cleanup();
+  vi.restoreAllMocks();
 });
 
 function fillRequiredFields() {
@@ -67,4 +69,23 @@ describe("CreateEventForm", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
   });
+  
+  it("strips leading/trailing whitespace from a submitted tier name", async () => {
+    const createEvent = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(useCreateEventModule, "useCreateEvent").mockReturnValue({
+      createEvent,
+      status: "idle",
+      error: null,
+      reset: vi.fn(),
+    });
+
+    render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+    fillRequiredFields();
+    fireEvent.change(screen.getByLabelText("Tier name"), { target: { value: "  VIP  " } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
+
+    await vi.waitFor(() => expect(createEvent).toHaveBeenCalledTimes(1));
+    expect(createEvent.mock.calls[0][0].tiers[0].name).toBe("VIP");
+  });
+  
 });
