@@ -10,7 +10,7 @@ function shortenAddress(address: string): string {
 }
 
 function WalletControl() {
-  const { address, isFreighterInstalled, isConnecting, connect, disconnect, error } = useWallet();
+  const { address, isConnecting, connect, disconnect, error } = useWallet();
   const { showToast } = useToast();
 
   // Show error toast when wallet connection fails
@@ -19,22 +19,6 @@ function WalletControl() {
       showToast(error, "error", 7000);
     }
   }, [error, showToast]);
-
-  if (!isFreighterInstalled) {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-500">Freighter not found</span>
-        <a
-          href="https://www.freighter.app/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-violet-500 hover:text-violet-400 transition-colors font-medium"
-        >
-          Install Freighter ↗
-        </a>
-      </div>
-    );
-  }
 
   if (address) {
     return (

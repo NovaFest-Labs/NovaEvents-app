@@ -40,7 +40,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockUseWallet.mockReturnValue({
     address: null,
-    isFreighterInstalled: true,
     isConnecting: false,
     isInitializing: false,
     error: null,

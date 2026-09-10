@@ -21,7 +21,7 @@ vi.mock("../context/ToastContext", () => ({
   useToast: vi.fn(),
 }));
 
-describe("Nav - Freighter Detection", () => {
+describe("Nav - Wallet Connection", () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -33,32 +33,9 @@ describe("Nav - Freighter Detection", () => {
     });
   });
 
-  it("shows Install Freighter link when extension not installed", () => {
+  it("shows Connect Wallet button when disconnected", () => {
     vi.mocked(useWallet).mockReturnValue({
       address: null,
-      isFreighterInstalled: false,
-      isConnecting: false,
-      isInitializing: false,
-      error: null,
-      connect: vi.fn(),
-      disconnect: vi.fn(),
-    });
-
-    render(<Nav />);
-
-    // WalletControl renders in both the desktop and mobile slots — at least
-    // one instance of each element must be present.
-    expect(screen.getAllByText(/Freighter not found/i).length).toBeGreaterThan(0);
-    const freighterLinks = screen.getAllByRole("link", { name: /Install Freighter/i });
-    expect(freighterLinks.length).toBeGreaterThan(0);
-    expect(freighterLinks[0]).toHaveAttribute("href", "https://www.freighter.app/");
-    expect(freighterLinks[0]).toHaveAttribute("target", "_blank");
-  });
-
-  it("shows Connect Wallet button when Freighter installed and wallet disconnected", () => {
-    vi.mocked(useWallet).mockReturnValue({
-      address: null,
-      isFreighterInstalled: true,
       isConnecting: false,
       isInitializing: false,
       error: null,
@@ -73,10 +50,28 @@ describe("Nav - Freighter Detection", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("opens the wallet picker when Connect Wallet is clicked", async () => {
+    const connect = vi.fn();
+    vi.mocked(useWallet).mockReturnValue({
+      address: null,
+      isConnecting: false,
+      isInitializing: false,
+      error: null,
+      connect,
+      disconnect: vi.fn(),
+    });
+
+    const { default: userEvent } = await import("@testing-library/user-event");
+    render(<Nav />);
+    const [btn] = screen.getAllByRole("button", { name: /Connect Wallet/i });
+    await userEvent.click(btn);
+
+    expect(connect).toHaveBeenCalled();
+  });
+
   it("shows wallet address and disconnect button when connected", () => {
     vi.mocked(useWallet).mockReturnValue({
       address: "GBUQWP3BOUZX34ULNQG23RQ6F4PFXJJEFVXM5VCCCMQVXN7U2TGZL",
-      isFreighterInstalled: true,
       isConnecting: false,
       isInitializing: false,
       error: null,
@@ -95,7 +90,6 @@ describe("Nav - Freighter Detection", () => {
   it("shows Connecting state when wallet is connecting", () => {
     vi.mocked(useWallet).mockReturnValue({
       address: null,
-      isFreighterInstalled: true,
       isConnecting: true,
       isInitializing: false,
       error: null,

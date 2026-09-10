@@ -24,7 +24,6 @@ const STUB_ADDRESS = "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK";
 function walletState(overrides: Partial<ReturnType<typeof useWallet>> = {}) {
   return {
     address: null,
-    isFreighterInstalled: true,
     isConnecting: false,
     isInitializing: false,
     error: null,

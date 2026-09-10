@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@creit.tech/stellar-wallets-kit": "^2.6.0",
     "@stellar/freighter-api": "^6.0.1",
     "jsqr": "^1.4.0",
     "next": "16.2.7",
