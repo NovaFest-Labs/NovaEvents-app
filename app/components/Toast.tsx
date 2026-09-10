@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 
 export type ToastType = "success" | "error";
 
+const EXIT_ANIMATION_DELAY = 300;
+const DEFAULT_DURATION = 5000;
+
 interface ToastProps {
   id: string;
   message: string;
@@ -12,7 +15,7 @@ interface ToastProps {
   onClose: (id: string) => void;
 }
 
-export function Toast({ id, message, type, duration = 5000, onClose }: ToastProps) {
+export function Toast({ id, message, type, duration = DEFAULT_DURATION, onClose }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export function Toast({ id, message, type, duration = 5000, onClose }: ToastProp
 
     const timer = setTimeout(() => {
       setIsExiting(true);
-      setTimeout(() => onClose(id), 300);
+      setTimeout(() => onClose(id), EXIT_ANIMATION_DELAY);
     }, duration);
 
     return () => clearTimeout(timer);
@@ -47,7 +50,7 @@ export function Toast({ id, message, type, duration = 5000, onClose }: ToastProp
         type="button"
         onClick={() => {
           setIsExiting(true);
-          setTimeout(() => onClose(id), 300);
+          setTimeout(() => onClose(id), EXIT_ANIMATION_DELAY);
         }}
         className="ml-2 hover:opacity-75 transition-opacity"
         aria-label="Close notification"
