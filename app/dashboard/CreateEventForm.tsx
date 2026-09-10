@@ -45,7 +45,7 @@ export default function CreateEventForm({
     if (!venue.trim()) return "Venue is required.";
     if (!date) return "Date is required.";
     if (date < today) return "Date must be today or in the future.";
-    if (!fundingGoal || Number(fundingGoal) <= 0) return "Funding goal must be greater than 0.";
+    if (!fundingGoal || !Number.isFinite(Number(fundingGoal)) || Number(fundingGoal) <= 0) return "Funding goal must be greater than 0.";
     if (tiers.length === 0) return "Add at least one ticket tier.";
     for (const tier of tiers) {
       if (!tier.name.trim() || !tier.price || !tier.supplyCap) {
