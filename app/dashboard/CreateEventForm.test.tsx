@@ -62,6 +62,30 @@ describe("CreateEventForm", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Date must be today or in the future.");
   });
 
+  it('rejects "Infinity" as a funding goal without creating an event', () => {
+    const createEvent = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(useCreateEventModule, "useCreateEvent").mockReturnValue({
+      createEvent,
+      status: "idle",
+      error: null,
+      reset: vi.fn(),
+    });
+
+    render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+    fillRequiredFields();
+    fireEvent.change(screen.getByLabelText("Date"), {
+      target: { value: new Date().toISOString().slice(0, 10) },
+    });
+    const fundingGoal = screen.getByLabelText("Funding goal (USDC)");
+    // Let the literal reach validation instead of number-input sanitization clearing it.
+    fundingGoal.setAttribute("type", "text");
+    fireEvent.change(fundingGoal, { target: { value: "Infinity" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Funding goal must be greater than 0.");
+    expect(createEvent).not.toHaveBeenCalled();
+  });
+
   it("submits and shows the not-wired-up-yet error once all fields are valid", async () => {
     render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
     fillRequiredFields();
