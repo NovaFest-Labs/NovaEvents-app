@@ -80,4 +80,43 @@ describe("useEvent", () => {
     expect(result.current.error).toMatch(/500/);
     expect(result.current.notFound).toBe(false);
   });
+
+  it("aborts previous request and ignores its result when id changes mid-flight", async () => {
+    let resolveFetch1: (value: Response) => void;
+    const fetch1Promise = new Promise<Response>(
+      (resolve) => (resolveFetch1 = resolve)
+    );
+
+    vi.mocked(fetch)
+      .mockReturnValueOnce(fetch1Promise)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ ...STUB_EVENT, id: "2" }),
+      } as Response);
+
+    const { result, rerender } = renderHook(
+      ({ id }) => useEvent(id),
+      { initialProps: { id: "1" } }
+    );
+
+    expect(result.current.loading).toBe(true);
+
+    // Change the id before the first fetch resolves
+    rerender({ id: "2" });
+
+    // Now resolve the first fetch (which should be aborted)
+    resolveFetch1!({
+      ok: true,
+      status: 200,
+      json: async () => STUB_EVENT, // This result should be ignored
+    } as Response);
+
+    // Wait for the second fetch to complete
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // The event should be from id "2", not id "1"
+    expect(result.current.event).toEqual({ ...STUB_EVENT, id: "2" });
+    expect(result.current.error).toBeNull();
+  });
 });
