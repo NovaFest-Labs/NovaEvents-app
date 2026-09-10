@@ -71,6 +71,7 @@ export function useEvent(id: string): UseEventResult {
           signal: controller.signal,
         });
         if (response.status === 404) {
+          if (controller.signal.aborted) return;
           setNotFound(true);
           return;
         }
@@ -78,6 +79,7 @@ export function useEvent(id: string): UseEventResult {
           throw new Error(`Failed to fetch event (${response.status})`);
         }
         const data = (await response.json()) as EventDetail;
+        if (controller.signal.aborted) return;
         setEvent(data);
       } catch (err) {
         if (controller.signal.aborted) return;
