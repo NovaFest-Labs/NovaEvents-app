@@ -92,18 +92,17 @@ export default function Home() {
             Open source. Open to contributors.
           </h2>
           <p className="text-slate-400 mb-8 leading-relaxed">
-            NovaEvents is open for contribution on GrantFox — the Stellar
-            ecosystem&apos;s open-source collaboration hub. Developers,
+            NovaEvents is open source and open for contribution. Developers,
             designers, and builders are welcome.
           </p>
           <a
-            href="https://grantfox.xyz"
+            href="https://github.com/NovaFest-Labs/NovaEvents"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Contribute on GrantFox (opens in a new tab)"
+            aria-label="Contribute on GitHub (opens in a new tab)"
             className="inline-block bg-violet-600 hover:bg-violet-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
           >
-            Contribute on GrantFox ↗
+            Contribute on GitHub ↗
           </a>
         </div>
       </section>
