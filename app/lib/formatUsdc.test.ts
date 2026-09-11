@@ -26,4 +26,8 @@ describe("formatUsdc", () => {
   it("formats very large amounts without scientific notation", () => {
     expect(formatUsdc("1000000000000000")).toBe("100,000,000 USDC");
   });
+
+  it("places the minus sign correctly for negative stroop values", () => {
+    expect(formatUsdc("-10000000")).toBe("-1 USDC");
+  });
 });
