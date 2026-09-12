@@ -30,4 +30,12 @@ describe("formatUsdc", () => {
   it("places the minus sign correctly for negative stroop values", () => {
     expect(formatUsdc("-10000000")).toBe("-1 USDC");
   });
+
+  it("returns a fallback instead of 'NaN USDC' for malformed input", () => {
+    expect(formatUsdc("not-a-number")).toBe("— USDC");
+  });
+
+  it("returns a fallback for values too large to be finite", () => {
+    expect(formatUsdc("1e999")).toBe("— USDC");
+  });
 });
