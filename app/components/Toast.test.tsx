@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, cleanup } from "@testing-library/react";
+import { render, screen, waitFor, cleanup, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Toast } from "./Toast";
 
@@ -83,5 +83,32 @@ describe("Toast", () => {
       },
       { timeout: 500 }
     );
+  });
+
+  it("never auto-dismisses when duration is 0", () => {
+    vi.useFakeTimers();
+    try {
+      const onClose = vi.fn();
+      render(
+        <Toast
+          id="test-5"
+          message="Persistent message"
+          type="success"
+          duration={0}
+          onClose={onClose}
+        />
+      );
+
+      // Well past any normal duration — duration={0} means the toast stays
+      // up until closed manually, so onClose must never fire on its own.
+      act(() => {
+        vi.advanceTimersByTime(30_000);
+      });
+
+      expect(onClose).not.toHaveBeenCalled();
+      expect(screen.getByText("Persistent message")).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
