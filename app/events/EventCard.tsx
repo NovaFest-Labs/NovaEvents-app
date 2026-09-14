@@ -3,11 +3,14 @@ import { formatUsdc } from "../lib/formatUsdc";
 import type { EventSummary } from "../hooks/useEvents";
 
 export default function EventCard({ event }: { event: EventSummary }) {
-  const formattedDate = new Date(event.date).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  const parsedDate = new Date(event.date);
+  const formattedDate = Number.isNaN(parsedDate.getTime())
+    ? "Date TBA"
+    : parsedDate.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
 
   return (
     <Link
