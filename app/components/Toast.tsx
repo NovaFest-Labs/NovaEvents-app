@@ -41,7 +41,7 @@ export function Toast({ id, message, type, duration = 5000, onClose }: ToastProp
 
   return (
     <div className={`${baseStyles} ${typeStyles[type]} ${exitStyles}`}>
-      <span className="text-lg font-bold">{icons[type]}</span>
+      <span className="text-lg font-bold" aria-hidden="true">{icons[type]}</span>
       <span className="flex-1 text-sm">{message}</span>
       <button
         type="button"
