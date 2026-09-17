@@ -19,6 +19,11 @@ export default function QrScanner({ onDecode, paused = false }: QrScannerProps) 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const onDecodeRef = useRef(onDecode);
+
+  useEffect(() => {
+    onDecodeRef.current = onDecode;
+  }, [onDecode]);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -66,7 +71,7 @@ export default function QrScanner({ onDecode, paused = false }: QrScannerProps) 
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const result = jsQR(imageData.data, imageData.width, imageData.height);
           if (result?.data) {
-            onDecode(result.data);
+            onDecodeRef.current(result.data);
           }
         }
       }
@@ -81,7 +86,6 @@ export default function QrScanner({ onDecode, paused = false }: QrScannerProps) 
       cancelAnimationFrame(frameId);
       stream?.getTracks().forEach((track) => track.stop());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused]);
 
   if (cameraError) {
