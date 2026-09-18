@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { useCreateEvent, type CreateEventTierInput } from "../hooks/useCreateEvent";
 
-const EMPTY_TIER: CreateEventTierInput = { name: "", price: "", supplyCap: "" };
+interface TierRow extends CreateEventTierInput {
+  /** Stable identity for React's key, independent of the row's position. */
+  id: string;
+}
+
+function createEmptyTier(): TierRow {
+  return { id: crypto.randomUUID(), name: "", price: "", supplyCap: "" };
+}
 
 interface CreateEventFormProps {
   organizerAddress: string;
@@ -21,22 +28,22 @@ export default function CreateEventForm({
   const [venue, setVenue] = useState("");
   const [date, setDate] = useState("");
   const [fundingGoal, setFundingGoal] = useState("");
-  const [tiers, setTiers] = useState<CreateEventTierInput[]>([{ ...EMPTY_TIER }]);
+  const [tiers, setTiers] = useState<TierRow[]>([createEmptyTier()]);
   const [validationError, setValidationError] = useState<string | null>(null);
   const today = new Date().toISOString().slice(0, 10);
 
-  function updateTier(index: number, field: keyof CreateEventTierInput, value: string) {
+  function updateTier(id: string, field: keyof CreateEventTierInput, value: string) {
     setTiers((prev) =>
-      prev.map((tier, i) => (i === index ? { ...tier, [field]: value } : tier))
+      prev.map((tier) => (tier.id === id ? { ...tier, [field]: value } : tier))
     );
   }
 
   function addTier() {
-    setTiers((prev) => [...prev, { ...EMPTY_TIER }]);
+    setTiers((prev) => [...prev, createEmptyTier()]);
   }
 
-  function removeTier(index: number) {
-    setTiers((prev) => prev.filter((_, i) => i !== index));
+  function removeTier(id: string) {
+    setTiers((prev) => prev.filter((tier) => tier.id !== id));
   }
 
   function validate(): string | null {
@@ -157,49 +164,49 @@ export default function CreateEventForm({
         <h3 className="text-sm font-medium text-slate-300 mb-3">Ticket tiers</h3>
         <div className="space-y-3">
           {tiers.map((tier, i) => (
-            <div key={i} className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_auto] gap-3 items-end">
+            <div key={tier.id} className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_auto] gap-3 items-end">
               <div className="flex flex-col gap-1">
-                <label htmlFor={`tier-name-${i}`} className="text-xs text-slate-500">
+                <label htmlFor={`tier-name-${tier.id}`} className="text-xs text-slate-500">
                   Tier name
                 </label>
                 <input
-                  id={`tier-name-${i}`}
+                  id={`tier-name-${tier.id}`}
                   value={tier.name}
-                  onChange={(e) => updateTier(i, "name", e.target.value)}
+                  onChange={(e) => updateTier(tier.id, "name", e.target.value)}
                   className="bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor={`tier-price-${i}`} className="text-xs text-slate-500">
+                <label htmlFor={`tier-price-${tier.id}`} className="text-xs text-slate-500">
                   Price (USDC)
                 </label>
                 <input
-                  id={`tier-price-${i}`}
+                  id={`tier-price-${tier.id}`}
                   type="number"
                   min="0"
                   step="0.0000001"
                   value={tier.price}
-                  onChange={(e) => updateTier(i, "price", e.target.value)}
+                  onChange={(e) => updateTier(tier.id, "price", e.target.value)}
                   className="bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <label htmlFor={`tier-supply-${i}`} className="text-xs text-slate-500">
+                <label htmlFor={`tier-supply-${tier.id}`} className="text-xs text-slate-500">
                   Supply cap
                 </label>
                 <input
-                  id={`tier-supply-${i}`}
+                  id={`tier-supply-${tier.id}`}
                   type="number"
                   min="1"
                   step="1"
                   value={tier.supplyCap}
-                  onChange={(e) => updateTier(i, "supplyCap", e.target.value)}
+                  onChange={(e) => updateTier(tier.id, "supplyCap", e.target.value)}
                   className="bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
                 />
               </div>
               <button
                 type="button"
-                onClick={() => removeTier(i)}
+                onClick={() => removeTier(tier.id)}
                 disabled={tiers.length === 1}
                 aria-label={`Remove tier ${i + 1}`}
                 className="sm:self-end text-slate-500 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed text-sm px-2 py-2"

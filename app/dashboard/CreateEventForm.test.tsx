@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CreateEventForm from "./CreateEventForm";
 import * as useCreateEventModule from "../hooks/useCreateEvent";
 
@@ -111,5 +112,27 @@ describe("CreateEventForm", () => {
     await vi.waitFor(() => expect(createEvent).toHaveBeenCalledTimes(1));
     expect(createEvent.mock.calls[0][0].tiers[0].name).toBe("VIP");
   });
-  
+
+  it("keeps focus on the tier a user is editing when an earlier tier is removed", async () => {
+    const user = userEvent.setup();
+    render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+
+    fireEvent.change(screen.getByLabelText("Tier name"), { target: { value: "Alpha" } });
+    fireEvent.click(screen.getByText("+ Add tier"));
+
+    const tierNameInputs = screen.getAllByLabelText("Tier name");
+    fireEvent.change(tierNameInputs[1], { target: { value: "Beta" } });
+
+    const betaInput = screen.getAllByLabelText("Tier name")[1];
+    await user.click(betaInput);
+    expect(document.activeElement).toBe(betaInput);
+
+    fireEvent.click(screen.getByLabelText("Remove tier 1"));
+
+    // Only "Beta"'s row remains. With a stable per-tier key, React reuses
+    // the same DOM node the user was focused in, so focus survives the
+    // removal instead of being dropped back to the document body.
+    expect(document.activeElement).toBe(betaInput);
+    expect(screen.getByLabelText("Tier name")).toHaveValue("Beta");
+  });
 });
