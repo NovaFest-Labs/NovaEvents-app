@@ -20,7 +20,24 @@ export default function DashboardPage() {
     }
   }, [isInitializing, walletAddress, router]);
 
-  if (isInitializing || walletAddress === null) {
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white">
+        <Nav />
+        <div
+          role="status"
+          aria-live="polite"
+          aria-label="Checking wallet connection"
+          className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 animate-pulse"
+        >
+          <div className="h-8 bg-slate-800 rounded w-1/3 mb-3" />
+          <div className="h-4 bg-slate-900 rounded w-2/3" />
+        </div>
+      </div>
+    );
+  }
+
+  if (walletAddress === null) {
     return (
       <div className="min-h-screen bg-slate-950 text-white">
         <Nav />

@@ -64,6 +64,13 @@ describe("DashboardPage", () => {
     expect(screen.queryByText("Organizer Dashboard")).not.toBeInTheDocument();
   });
 
+  it("shows a loading indicator while the wallet connection is still being checked", () => {
+    mockUseWallet.mockReturnValue(walletState({ isInitializing: true, address: null }));
+    render(<DashboardPage />);
+
+    expect(screen.getByRole("status")).toBeInTheDocument();
+  });
+
   it("does not redirect once a wallet is connected", () => {
     mockUseWallet.mockReturnValue(walletState({ address: STUB_ADDRESS }));
     render(<DashboardPage />);
