@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useWallet } from "../hooks/useWallet";
 import { useToast } from "../context/ToastContext";
 import { useEffect, useState } from "react";
-
-function shortenAddress(address: string): string {
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
+import { shortenAddress } from "../lib/shortenAddress";
 
 function WalletControl() {
   const { address, isConnecting, connect, disconnect, error } = useWallet();

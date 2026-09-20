@@ -7,6 +7,7 @@ import CopyableAddress from "../../components/CopyableAddress";
 import { useWallet } from "../../hooks/useWallet";
 import { useEvent, type TicketTier } from "../../hooks/useEvent";
 import { formatUsdc } from "../../lib/formatUsdc";
+import { shortenAddress } from "../../lib/shortenAddress";
 import { useToast } from "../../context/ToastContext";
 import { useSponsorEvent, MAX_USDC } from "../../hooks/useSponsorEvent";
 
@@ -333,12 +334,6 @@ function SponsorPanel({
   );
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function shortenAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-6)}`;
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function EventDetail({ id }: { id: string }) {
@@ -440,7 +435,7 @@ export default function EventDetail({ id }: { id: string }) {
                             }
                           >
                             <td className="p-4 font-mono text-slate-300 break-all">
-                              {shortenAddress(sponsorship.sponsor_address)}
+                              {shortenAddress(sponsorship.sponsor_address, 6)}
                             </td>
                             <td className="p-4 text-right whitespace-nowrap">
                               {formatUsdc(sponsorship.amount)}
