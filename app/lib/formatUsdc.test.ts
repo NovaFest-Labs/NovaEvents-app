@@ -38,4 +38,12 @@ describe("formatUsdc", () => {
   it("returns a fallback for values too large to be finite", () => {
     expect(formatUsdc("1e999")).toBe("— USDC");
   });
+
+  it("returns a fallback for an empty string", () => {
+    expect(formatUsdc("")).toBe("— USDC");
+  });
+
+  it("returns a fallback for a partially-numeric string", () => {
+    expect(formatUsdc("12abc")).toBe("— USDC");
+  });
 });

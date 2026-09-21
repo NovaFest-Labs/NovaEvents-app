@@ -1,6 +1,6 @@
 export function formatUsdc(stroops: string): string {
   const amount = Number(stroops);
-  if (!Number.isFinite(amount)) {
+  if (stroops.trim() === "" || !Number.isFinite(amount)) {
     // Malformed input (e.g. an unexpected API response) would otherwise render
     // the literal text "NaN USDC", so fall back to an em dash placeholder.
     return "— USDC";
