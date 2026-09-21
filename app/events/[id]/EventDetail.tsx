@@ -120,7 +120,13 @@ function EventError({ message }: { message: string }) {
         <p className="text-red-300 font-medium mb-2">
           Couldn&apos;t load this event
         </p>
-        <p className="text-slate-400 text-sm">{message}</p>
+        <p className="text-slate-400 text-sm mb-6">{message}</p>
+        <Link
+          href="/events"
+          className="inline-block bg-violet-600 hover:bg-violet-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+        >
+          Back to events
+        </Link>
       </div>
     </div>
   );

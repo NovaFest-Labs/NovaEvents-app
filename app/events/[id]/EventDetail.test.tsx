@@ -92,6 +92,18 @@ describe("EventDetail", () => {
     expect(screen.getByText("Couldn't load this event")).toBeInTheDocument();
   });
 
+  it("gives the user a way back to the events list from the error state", () => {
+    mockUseEvent.mockReturnValue(
+      eventState({ error: "Failed to fetch event (500)" })
+    );
+    render(<EventDetail id="1" />);
+
+    expect(screen.getByRole("link", { name: "Back to events" })).toHaveAttribute(
+      "href",
+      "/events"
+    );
+  });
+
   it("renders event details, tiers, and sponsorships", () => {
     mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
     render(<EventDetail id="1" />);
