@@ -1,5 +1,7 @@
 # NovaEvents App
 
+[![CI](https://github.com/NovaFest-Labs/NovaEvents-app/actions/workflows/ci.yml/badge.svg)](https://github.com/NovaFest-Labs/NovaEvents-app/actions/workflows/ci.yml)
+
 Frontend for NovaEvents — a transparent event management platform on Stellar.
 
 Built with Next.js, TypeScript, and Tailwind CSS.
