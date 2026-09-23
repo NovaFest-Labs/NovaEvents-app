@@ -47,6 +47,7 @@ export default function OrganizerEventCard({ event }: { event: OrganizerEvent })
             reset();
             setScannerOpen((open) => !open);
           }}
+          aria-expanded={scannerOpen}
           className="shrink-0 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors"
         >
           {scannerOpen ? "Close scanner" : "Scan QR"}

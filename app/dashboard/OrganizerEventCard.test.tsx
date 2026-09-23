@@ -41,6 +41,19 @@ describe("OrganizerEventCard", () => {
     expect(screen.queryByLabelText(/Camera preview/)).not.toBeInTheDocument();
   });
 
+  it("reflects the scanner's open/closed state via aria-expanded", () => {
+    render(<OrganizerEventCard event={STUB_EVENT} />);
+
+    const toggle = screen.getByRole("button", { name: "Scan QR" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "Close scanner" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    );
+  });
+
   it("shows the scanner's camera-unavailable fallback when opened in a camera-less environment", async () => {
     render(<OrganizerEventCard event={STUB_EVENT} />);
 
