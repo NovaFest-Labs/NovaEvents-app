@@ -132,6 +132,15 @@ describe("EventDetail", () => {
     expect(screen.getByRole("button", { name: "Sponsor" })).toBeDisabled();
   });
 
+  it("visibly explains why Buy Ticket is disabled, not just via a title tooltip", () => {
+    mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
+    render(<EventDetail id="1" />);
+
+    expect(
+      screen.getAllByText(/connect your wallet to buy a ticket/i).length
+    ).toBeGreaterThan(0);
+  });
+
   it("marks a sold-out tier and keeps it disabled even when wallet is connected", () => {
     mockUseWallet.mockReturnValue(
       walletState({ address: "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK" })

@@ -163,6 +163,11 @@ function BuyTicketButton({
       >
         {soldOut ? "Sold out" : "Buy Ticket"}
       </button>
+      {!walletConnected && (
+        <p className="text-xs text-slate-500 max-w-[16rem] text-right">
+          Connect your wallet to buy a ticket.
+        </p>
+      )}
       {message && (
         <p className="text-xs text-slate-500 max-w-[16rem] text-right">
           {message}
