@@ -116,6 +116,13 @@ describe("EventDetail", () => {
     expect(screen.getByText(/GASPON\.\.\./)).toBeInTheDocument();
   });
 
+  it("gives the sponsorships table an accessible name", () => {
+    mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
+    render(<EventDetail id="1" />);
+
+    expect(screen.getByRole("table", { name: /sponsorships/i })).toBeInTheDocument();
+  });
+
   it("disables Buy Ticket and Sponsor when wallet is not connected", () => {
     mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
     render(<EventDetail id="1" />);

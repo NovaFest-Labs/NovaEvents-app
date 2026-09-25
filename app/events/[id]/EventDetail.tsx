@@ -422,6 +422,7 @@ export default function EventDetail({ id }: { id: string }) {
                 ) : (
                   <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
+                      <caption className="sr-only">Event sponsorships</caption>
                       <thead>
                         <tr className="border-b border-white/10 text-left text-slate-400">
                           <th className="p-4 font-medium">Sponsor</th>
