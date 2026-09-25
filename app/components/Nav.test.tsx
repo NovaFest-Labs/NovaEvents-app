@@ -103,4 +103,20 @@ describe("Nav - Wallet Connection", () => {
     expect(connectingButtons.length).toBeGreaterThan(0);
     expect(connectingButtons[0]).toBeDisabled();
   });
+
+  it("announces that the GitHub link opens in a new tab", () => {
+    vi.mocked(useWallet).mockReturnValue({
+      address: null,
+      isConnecting: false,
+      isInitializing: false,
+      error: null,
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+    });
+
+    render(<Nav />);
+
+    const githubLinks = screen.getAllByRole("link", { name: /opens in a new tab/i });
+    expect(githubLinks.length).toBeGreaterThan(0);
+  });
 });

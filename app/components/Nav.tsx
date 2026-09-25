@@ -78,6 +78,7 @@ export default function Nav() {
             href="https://github.com/NovaFest-Labs/NovaEvents"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="View source on GitHub (opens in a new tab)"
             className="text-sm text-slate-400 hover:text-white transition-colors"
           >
             GitHub ↗
@@ -131,6 +132,7 @@ export default function Nav() {
             href="https://github.com/NovaFest-Labs/NovaEvents"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="View source on GitHub (opens in a new tab)"
             className="block px-2 py-2.5 text-sm text-slate-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
             onClick={() => setMenuOpen(false)}
           >
