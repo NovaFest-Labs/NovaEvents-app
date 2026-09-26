@@ -51,4 +51,29 @@ describe("useOrganizerEvents", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toMatch(/500/);
   });
+
+  it("re-fetches and updates events when refetch is called", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => STUB_RESPONSE,
+    } as Response);
+
+    const { result } = renderHook(() => useOrganizerEvents("GORGANIZER"));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(fetch).toHaveBeenCalledOnce();
+
+    const updatedResponse = [
+      ...STUB_RESPONSE,
+      { id: "2", name: "New Event", tickets_sold: 0, current_balance: "0" },
+    ];
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedResponse,
+    } as Response);
+
+    result.current.refetch();
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(result.current.events).toEqual(updatedResponse));
+  });
 });
