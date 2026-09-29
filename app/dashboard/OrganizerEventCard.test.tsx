@@ -36,6 +36,18 @@ describe("OrganizerEventCard", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
   });
 
+  it("clears a stale check-in message once the ticket ID is edited again", async () => {
+    render(<OrganizerEventCard event={STUB_EVENT} />);
+
+    fireEvent.change(screen.getByLabelText("Ticket ID"), { target: { value: "42" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check In" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
+
+    fireEvent.change(screen.getByLabelText("Ticket ID"), { target: { value: "43" } });
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("does not render the camera scanner until 'Scan QR' is clicked", () => {
     render(<OrganizerEventCard event={STUB_EVENT} />);
     expect(screen.queryByLabelText(/Camera preview/)).not.toBeInTheDocument();
