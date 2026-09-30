@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGetTicket } from "./useGetTicket";
 import { useRedeemTicket } from "./useRedeemTicket";
 import { parseTicketQrPayload } from "../lib/ticketQrPayload";
@@ -30,8 +30,15 @@ export function useTicketCheckIn(): UseTicketCheckInResult {
   const [status, setStatus] = useState<CheckInStatus>("idle");
   const [message, setMessage] = useState<string | null>(null);
 
-  async function finishWithRedeem(eventId: string, ticketId: string) {
+  // Bumped by reset() (and at the start of each new attempt) so a check-in
+  // that's still in flight when the organizer clears the field can't
+  // overwrite that reset once it resolves.
+  const generationRef = useRef(0);
+
+  async function finishWithRedeem(eventId: string, ticketId: string, generation: number) {
     const outcome = await redeemTicket(eventId, ticketId);
+    if (generation !== generationRef.current) return;
+
     if (!outcome.success) {
       setStatus("error");
       setMessage(outcome.error ?? "Failed to check in ticket.");
@@ -42,6 +49,7 @@ export function useTicketCheckIn(): UseTicketCheckInResult {
   }
 
   async function checkInFromQr(eventId: string, rawPayload: string): Promise<void> {
+    const generation = ++generationRef.current;
     setStatus("checking");
     setMessage(null);
 
@@ -60,6 +68,7 @@ export function useTicketCheckIn(): UseTicketCheckInResult {
 
     try {
       const ticket = await getTicket(payload.event_id, payload.ticket_id);
+      if (generation !== generationRef.current) return;
 
       if (ticket.redeemed) {
         setStatus("rejected");
@@ -73,20 +82,23 @@ export function useTicketCheckIn(): UseTicketCheckInResult {
         return;
       }
 
-      await finishWithRedeem(payload.event_id, payload.ticket_id);
+      await finishWithRedeem(payload.event_id, payload.ticket_id, generation);
     } catch (err) {
+      if (generation !== generationRef.current) return;
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Failed to verify ticket.");
     }
   }
 
   async function checkInFromTicketId(eventId: string, ticketId: string): Promise<void> {
+    const generation = ++generationRef.current;
     setStatus("checking");
     setMessage(null);
-    await finishWithRedeem(eventId, ticketId);
+    await finishWithRedeem(eventId, ticketId, generation);
   }
 
   function reset() {
+    generationRef.current++;
     setStatus("idle");
     setMessage(null);
   }

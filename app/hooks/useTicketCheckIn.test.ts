@@ -135,4 +135,37 @@ describe("useTicketCheckIn", () => {
     expect(mockRedeemTicket).toHaveBeenCalledWith("event-1", "42");
     expect(result.current.status).toBe("success");
   });
+
+  it("ignores a stale in-flight result after reset() is called", async () => {
+    let resolveRedeem!: (value: { success: boolean }) => void;
+    mockRedeemTicket.mockReturnValue(
+      new Promise((resolve) => {
+        resolveRedeem = resolve;
+      })
+    );
+
+    const { result } = renderHook(() => useTicketCheckIn());
+
+    // Fire the check-in but don't await it yet — it's left pending.
+    let inFlight!: Promise<void>;
+    act(() => {
+      inFlight = result.current.checkInFromTicketId("event-1", "42");
+    });
+    expect(result.current.status).toBe("checking");
+
+    // The organizer clears the field before the pending call resolves.
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.status).toBe("idle");
+
+    // Now let the stale redeemTicket call resolve.
+    await act(async () => {
+      resolveRedeem({ success: true });
+      await inFlight;
+    });
+
+    expect(result.current.status).toBe("idle");
+    expect(result.current.message).toBeNull();
+  });
 });
