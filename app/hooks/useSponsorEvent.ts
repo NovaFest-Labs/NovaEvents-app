@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { getApiBaseUrl } from "../lib/env";
 
 export type SponsorStatus = "idle" | "confirming" | "pending" | "success" | "error";
 
@@ -16,12 +15,13 @@ interface UseSponsorEventResult {
   /** Go back from confirmation to the amount-input step. */
   cancel: () => void;
   /**
-   * Submit the confirmed sponsorship.  In production this will call the
-   * Soroban contract via the Freighter wallet; for now it POSTs to the
-   * REST API so the rest of the flow (toast, list refresh) is fully wired.
+   * Submit the confirmed sponsorship.
    *
-   * TODO (issue #1): replace the fetch with the Soroban contract client call:
+   * TODO (issue #1): once the Soroban contract client lands, call
    *   await contractClient.sponsorEvent({ event: eventId, amount: stroops, sponsor: sponsorAddress })
+   * There is no backend endpoint for this — sponsor_event requires the
+   * sponsor's own signature (require_auth), which only their wallet can
+   * provide, so this can never be a plain API POST.
    */
   submit: (eventId: string, sponsorAddress: string) => Promise<void>;
   /** Amount currently staged for confirmation (decimal USDC string). */
@@ -32,13 +32,6 @@ interface UseSponsorEventResult {
 
 /** Maximum single-contribution in USDC (client-side guard). */
 const MAX_USDC = 1_000_000;
-
-/** Convert a decimal USDC string to the integer stroops string the API expects. */
-function usdcToStroops(usdc: string): string {
-  // Multiply by 10_000_000 (7 decimal places on Stellar).
-  const stroops = Math.round(parseFloat(usdc) * 10_000_000);
-  return String(stroops);
-}
 
 export function useSponsorEvent(): UseSponsorEventResult {
   const [status, setStatus] = useState<SponsorStatus>("idle");
@@ -57,26 +50,14 @@ export function useSponsorEvent(): UseSponsorEventResult {
   }
 
   async function submit(eventId: string, sponsorAddress: string) {
+    void eventId;
+    void sponsorAddress;
     setStatus("pending");
     setError(null);
     try {
-      const baseUrl = getApiBaseUrl();
-      const response = await fetch(`${baseUrl}/api/events/${eventId}/sponsor`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sponsor_address: sponsorAddress,
-          amount: usdcToStroops(stagedAmount),
-        }),
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        const msg =
-          (body as { message?: string }).message ??
-          `Sponsorship failed (${response.status})`;
-        throw new Error(msg);
-      }
-      setStatus("success");
+      throw new Error(
+        "Sponsoring isn't wired up to the contract yet — see issue #1."
+      );
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Sponsorship failed — please try again.";
