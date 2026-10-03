@@ -135,4 +135,27 @@ describe("CreateEventForm", () => {
     expect(document.activeElement).toBe(betaInput);
     expect(screen.getByLabelText("Tier name")).toHaveValue("Beta");
   });
+
+  it("rejects a non-integer tier supply cap, since the contract's supply_cap is a u32", () => {
+    const createEvent = vi.fn().mockResolvedValue(undefined);
+    vi.spyOn(useCreateEventModule, "useCreateEvent").mockReturnValue({
+      createEvent,
+      status: "idle",
+      error: null,
+      reset: vi.fn(),
+    });
+
+    render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+    fillRequiredFields();
+    const supplyCap = screen.getByLabelText("Supply cap");
+    // Let the literal reach validation instead of number-input sanitization clearing it.
+    supplyCap.setAttribute("type", "text");
+    fireEvent.change(supplyCap, { target: { value: "2.5" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Tier supply cap must be a whole number."
+    );
+    expect(createEvent).not.toHaveBeenCalled();
+  });
 });

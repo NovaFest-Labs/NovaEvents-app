@@ -60,6 +60,8 @@ export default function CreateEventForm({
       }
       if (Number(tier.price) <= 0) return "Tier price must be greater than 0.";
       if (Number(tier.supplyCap) <= 0) return "Tier supply cap must be greater than 0.";
+      if (!Number.isInteger(Number(tier.supplyCap)))
+        return "Tier supply cap must be a whole number.";
     }
     return null;
   }
