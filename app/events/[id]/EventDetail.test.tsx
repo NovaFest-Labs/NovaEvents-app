@@ -203,4 +203,23 @@ describe("EventDetail", () => {
       "Amount must be greater than 0."
     );
   });
+
+  it("rejects an amount with trailing non-numeric characters instead of silently truncating it", () => {
+    mockUseWallet.mockReturnValue(
+      walletState({ address: "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK" })
+    );
+    mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
+    render(<EventDetail id="1" />);
+
+    const amountInput = screen.getByLabelText("Sponsorship amount (USDC)");
+    // Let the literal reach validation instead of number-input sanitization clearing it.
+    amountInput.setAttribute("type", "text");
+    fireEvent.change(amountInput, { target: { value: "25abc" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sponsor" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Amount must be greater than 0."
+    );
+    expect(screen.queryByText("Confirm sponsorship")).not.toBeInTheDocument();
+  });
 });

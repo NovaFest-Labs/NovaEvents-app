@@ -182,8 +182,10 @@ function BuyTicketButton({
 /** Client-side validation for the raw USDC amount string. */
 function validateAmount(raw: string): string | null {
   if (!raw || raw.trim() === "") return "Please enter an amount.";
-  const n = parseFloat(raw);
-  if (isNaN(n) || n <= 0) return "Amount must be greater than 0.";
+  // Number() rejects trailing garbage (e.g. "25abc") that parseFloat would
+  // silently truncate into a valid-looking amount.
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return "Amount must be greater than 0.";
   if (n > MAX_USDC)
     return `Amount cannot exceed ${MAX_USDC.toLocaleString()} USDC.`;
   return null;
