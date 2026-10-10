@@ -43,6 +43,25 @@ describe("Toast", () => {
     expect(icons.length).toBeGreaterThanOrEqual(1);
   });
 
+  it("announces an error toast assertively to screen readers", () => {
+    // Some failures (e.g. a rejected sponsorship, a failed wallet connect)
+    // are only ever reported through a toast, so it must be announced.
+    render(
+      <Toast id="a11y-1" message="Sponsorship failed" type="error" duration={0} onClose={vi.fn()} />
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent("Sponsorship failed");
+  });
+
+  it("announces a success toast politely to screen readers", () => {
+    render(
+      <Toast id="a11y-2" message="Sponsored 25 USDC" type="success" duration={0} onClose={vi.fn()} />
+    );
+
+    expect(screen.getByRole("status")).toHaveTextContent("Sponsored 25 USDC");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("calls onClose when close button is clicked", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();

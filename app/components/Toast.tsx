@@ -43,7 +43,10 @@ export function Toast({ id, message, type, duration = DEFAULT_DURATION, onClose 
   };
 
   return (
-    <div className={`${baseStyles} ${typeStyles[type]} ${exitStyles}`}>
+    <div
+      role={type === "error" ? "alert" : "status"}
+      className={`${baseStyles} ${typeStyles[type]} ${exitStyles}`}
+    >
       <span className="text-lg font-bold" aria-hidden="true">{icons[type]}</span>
       <span className="flex-1 text-sm">{message}</span>
       <button
