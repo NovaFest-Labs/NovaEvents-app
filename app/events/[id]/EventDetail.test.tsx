@@ -104,6 +104,16 @@ describe("EventDetail", () => {
     );
   });
 
+  it('shows "Date TBA" when the API omits a date it couldn\'t represent', () => {
+    // The API drops `date` for an on-chain date_unix past what JavaScript
+    // can represent (~year 275760) instead of failing the request.
+    mockUseEvent.mockReturnValue(eventState({ event: { ...STUB_EVENT, date: undefined } }));
+    render(<EventDetail id="1" />);
+
+    expect(screen.getByText(/The Grand Hall · Date TBA/)).toBeInTheDocument();
+    expect(screen.queryByText(/Invalid Date/)).not.toBeInTheDocument();
+  });
+
   it("renders event details, tiers, and sponsorships", () => {
     mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
     render(<EventDetail id="1" />);

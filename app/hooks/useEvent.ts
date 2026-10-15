@@ -21,7 +21,8 @@ export interface EventDetail {
   name: string;
   description: string;
   venue: string;
-  date: string;
+  /** Absent when the on-chain date can't be represented in JS (~year 275760+). */
+  date?: string;
   organizer_address: string;
   funding_goal: string;
   current_balance: string;

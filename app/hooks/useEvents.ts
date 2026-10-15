@@ -7,7 +7,8 @@ export interface EventSummary {
   id: string;
   name: string;
   venue: string;
-  date: string;
+  /** Absent when the on-chain date can't be represented in JS (~year 275760+). */
+  date?: string;
   funding_goal: string;
   current_balance: string;
   tier_count: number;

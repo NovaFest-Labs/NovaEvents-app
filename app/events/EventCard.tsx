@@ -3,7 +3,7 @@ import { formatUsdc } from "../lib/formatUsdc";
 import type { EventSummary } from "../hooks/useEvents";
 
 export default function EventCard({ event }: { event: EventSummary }) {
-  const parsedDate = new Date(event.date);
+  const parsedDate = new Date(event.date ?? NaN);
   const formattedDate = Number.isNaN(parsedDate.getTime())
     ? "Date TBA"
     : parsedDate.toLocaleDateString(undefined, {

@@ -349,6 +349,14 @@ function SponsorPanel({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+function formatEventDate(date: string | undefined): string {
+  // `date` is absent when the on-chain date can't be represented in JS.
+  const parsed = new Date(date ?? NaN);
+  return Number.isNaN(parsed.getTime())
+    ? "Date TBA"
+    : parsed.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+}
+
 export default function EventDetail({ id }: { id: string }) {
   const { event, loading, error, notFound, refetch } = useEvent(id);
   const { address: walletAddress } = useWallet();
@@ -375,12 +383,7 @@ export default function EventDetail({ id }: { id: string }) {
               </span>
             </div>
             <p className="text-slate-400 mb-6">
-              {event.venue} ·{" "}
-              {new Date(event.date).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {event.venue} · {formatEventDate(event.date)}
             </p>
             <p className="text-slate-300 max-w-3xl">{event.description}</p>
           </div>
