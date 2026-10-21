@@ -12,6 +12,17 @@ function createEmptyTier(): TierRow {
   return { id: crypto.randomUUID(), name: "", price: "", supplyCap: "" };
 }
 
+/**
+ * YYYY-MM-DD in the user's own timezone, matching what a date input shows.
+ * toISOString() would give the UTC date, which is a day off for part of
+ * every day anywhere outside UTC.
+ */
+function localDateString(d: Date): string {
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
 interface CreateEventFormProps {
   organizerAddress: string;
   onCreated?: () => void;
@@ -30,7 +41,7 @@ export default function CreateEventForm({
   const [fundingGoal, setFundingGoal] = useState("");
   const [tiers, setTiers] = useState<TierRow[]>([createEmptyTier()]);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateString(new Date());
 
   function updateTier(id: string, field: keyof CreateEventTierInput, value: string) {
     setTiers((prev) =>

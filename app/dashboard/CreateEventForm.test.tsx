@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateEventForm from "./CreateEventForm";
@@ -15,7 +15,8 @@ function fillRequiredFields() {
   fireEvent.change(screen.getByLabelText("Event name"), { target: { value: "StellarFest" } });
   fireEvent.change(screen.getByLabelText("Venue"), { target: { value: "The Grand Hall" } });
   fireEvent.change(screen.getByLabelText("Description"), { target: { value: "A great event." } });
-  fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2026-11-01" } });
+  // Far enough out that it stays a future date whenever the suite runs.
+  fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2099-12-31" } });
   fireEvent.change(screen.getByLabelText("Funding goal (USDC)"), { target: { value: "1000" } });
   fireEvent.change(screen.getByLabelText("Tier name"), { target: { value: "General" } });
   fireEvent.change(screen.getByLabelText("Price (USDC)"), { target: { value: "50" } });
@@ -74,9 +75,6 @@ describe("CreateEventForm", () => {
 
     render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
     fillRequiredFields();
-    fireEvent.change(screen.getByLabelText("Date"), {
-      target: { value: new Date().toISOString().slice(0, 10) },
-    });
     const fundingGoal = screen.getByLabelText("Funding goal (USDC)");
     // Let the literal reach validation instead of number-input sanitization clearing it.
     fundingGoal.setAttribute("type", "text");
@@ -134,6 +132,55 @@ describe("CreateEventForm", () => {
     // removal instead of being dropped back to the document body.
     expect(document.activeElement).toBe(betaInput);
     expect(screen.getByLabelText("Tier name")).toHaveValue("Beta");
+  });
+
+  describe("'today' follows the user's local calendar date, not UTC", () => {
+    const originalTz = process.env.TZ;
+
+    afterEach(() => {
+      vi.useRealTimers();
+      process.env.TZ = originalTz;
+    });
+
+    function atLocalTime(tz: string, isoInstant: string) {
+      process.env.TZ = tz;
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.setSystemTime(new Date(isoInstant));
+    }
+
+    it("accepts today's local date in the evening west of UTC", () => {
+      // 9pm on Oct 21 in New York is already Oct 22 in UTC.
+      atLocalTime("America/New_York", "2026-10-22T01:00:00Z");
+      const createEvent = vi.fn().mockResolvedValue(undefined);
+      vi.spyOn(useCreateEventModule, "useCreateEvent").mockReturnValue({
+        createEvent,
+        status: "idle",
+        error: null,
+        reset: vi.fn(),
+      });
+
+      render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+      fillRequiredFields();
+      fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2026-10-21" } });
+      fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
+
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(createEvent).toHaveBeenCalledOnce();
+      expect(screen.getByLabelText("Date")).toHaveAttribute("min", "2026-10-21");
+    });
+
+    it("rejects yesterday's local date just after midnight east of UTC", () => {
+      // 00:30 on Oct 22 in Lagos is still Oct 21 in UTC.
+      atLocalTime("Africa/Lagos", "2026-10-21T23:30:00Z");
+
+      render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+      fillRequiredFields();
+      fireEvent.change(screen.getByLabelText("Date"), { target: { value: "2026-10-21" } });
+      fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
+
+      expect(screen.getByRole("alert")).toHaveTextContent("Date must be today or in the future.");
+      expect(screen.getByLabelText("Date")).toHaveAttribute("min", "2026-10-22");
+    });
   });
 
   it("rejects a non-integer tier supply cap, since the contract's supply_cap is a u32", () => {
