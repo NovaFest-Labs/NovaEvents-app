@@ -83,4 +83,40 @@ describe("useEvents", () => {
     expect(result.current.error).toBeNull();
     expect(result.current.events).toEqual(STUB_RESPONSE);
   });
+
+  it("aborts the previous request and ignores its result when retry is called mid-flight", async () => {
+    let resolveFetch1: (value: Response) => void;
+    const fetch1Promise = new Promise<Response>(
+      (resolve) => (resolveFetch1 = resolve)
+    );
+    const STALE_RESPONSE = [{ ...STUB_RESPONSE[0], id: "stale" }];
+
+    vi.mocked(fetch)
+      .mockReturnValueOnce(fetch1Promise)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => STUB_RESPONSE,
+      } as Response);
+
+    const { result } = renderHook(() => useEvents());
+    expect(result.current.loading).toBe(true);
+
+    // Call retry before the first fetch resolves.
+    act(() => {
+      result.current.retry();
+    });
+
+    // Resolve the first (now-superseded) fetch after retry has already
+    // started the second one. A real aborted fetch would reject, but a
+    // response can also already be in flight past the point abort() takes
+    // effect, so the hook must not trust this result either way.
+    resolveFetch1!({
+      ok: true,
+      json: async () => STALE_RESPONSE,
+    } as Response);
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.events).toEqual(STUB_RESPONSE);
+  });
 });

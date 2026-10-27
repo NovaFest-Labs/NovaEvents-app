@@ -48,6 +48,7 @@ export function useEvents(): UseEventsResult {
           throw new Error(`Failed to fetch events (${response.status})`);
         }
         const data = (await response.json()) as EventSummary[];
+        if (controller.signal.aborted) return;
         setEvents(data);
       } catch (err) {
         if (controller.signal.aborted) return;
