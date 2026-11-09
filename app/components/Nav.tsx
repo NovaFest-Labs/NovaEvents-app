@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useWallet } from "../hooks/useWallet";
 import { useToast } from "../context/ToastContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { shortenAddress } from "../lib/shortenAddress";
 
 function WalletControl() {
@@ -46,9 +46,33 @@ function WalletControl() {
 
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  // Standard disclosure-menu behavior: close on Escape or on a click/tap
+  // outside the nav, same as the wallet picker and other dropdowns a user
+  // would expect to dismiss this way.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    function handlePointerDown(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, [menuOpen]);
 
   return (
-    <nav className="border-b border-white/10 px-4 sm:px-6 py-4">
+    <nav ref={navRef} className="border-b border-white/10 px-4 sm:px-6 py-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
         <Link href="/" className="font-bold text-lg tracking-tight shrink-0">
           NovaEvents
