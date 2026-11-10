@@ -12,6 +12,11 @@ function createEmptyTier(): TierRow {
   return { id: crypto.randomUUID(), name: "", price: "", supplyCap: "" };
 }
 
+// Mirrors MAX_TIERS in NovaEvents/src/lib.rs. The contract rejects an event
+// with more tiers than this, so the UI must stop the organizer before they
+// submit a transaction that is guaranteed to fail.
+const MAX_TIERS = 20;
+
 /**
  * YYYY-MM-DD in the user's own timezone, matching what a date input shows.
  * toISOString() would give the UTC date, which is a day off for part of
@@ -50,7 +55,9 @@ export default function CreateEventForm({
   }
 
   function addTier() {
-    setTiers((prev) => [...prev, createEmptyTier()]);
+    setTiers((prev) =>
+      prev.length >= MAX_TIERS ? prev : [...prev, createEmptyTier()]
+    );
   }
 
   function removeTier(id: string) {
@@ -232,10 +239,16 @@ export default function CreateEventForm({
         <button
           type="button"
           onClick={addTier}
-          className="mt-3 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+          disabled={tiers.length >= MAX_TIERS}
+          className="mt-3 text-sm text-violet-400 hover:text-violet-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           + Add tier
         </button>
+        {tiers.length >= MAX_TIERS && (
+          <p className="mt-1 text-xs text-slate-500">
+            You&apos;ve reached the maximum of 20 ticket tiers per event.
+          </p>
+        )}
       </div>
 
       {validationError && (

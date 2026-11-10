@@ -48,6 +48,19 @@ describe("CreateEventForm", () => {
     expect(screen.getByLabelText("Remove tier 1")).toBeDisabled();
   });
 
+  it("disables 'Add tier' once the contract's 20-tier cap is reached", () => {
+    render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
+    const addTierButton = screen.getByText("+ Add tier");
+
+    for (let i = 1; i < 20; i++) {
+      fireEvent.click(addTierButton);
+    }
+
+    expect(screen.getAllByLabelText("Tier name")).toHaveLength(20);
+    expect(addTierButton).toBeDisabled();
+    expect(screen.getByText(/maximum of 20 ticket tiers/i)).toBeInTheDocument();
+  });
+
   it("shows a validation error when required fields are missing", () => {
     render(<CreateEventForm organizerAddress={STUB_ADDRESS} />);
     fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
