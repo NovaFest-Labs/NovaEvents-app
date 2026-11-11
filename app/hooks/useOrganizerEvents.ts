@@ -48,6 +48,7 @@ export function useOrganizerEvents(organizerAddress: string | null): UseOrganize
           throw new Error(`Failed to fetch your events (${response.status})`);
         }
         const data = (await response.json()) as OrganizerEvent[];
+        if (controller.signal.aborted) return;
         setEvents(data);
       } catch (err) {
         if (controller.signal.aborted) return;
