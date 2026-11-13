@@ -20,11 +20,20 @@ export default function QrScanner({ onDecode, paused = false }: QrScannerProps) 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const onDecodeRef = useRef(onDecode);
+  const pausedRef = useRef(paused);
 
   useEffect(() => {
     onDecodeRef.current = onDecode;
   }, [onDecode]);
 
+  useEffect(() => {
+    pausedRef.current = paused;
+  }, [paused]);
+
+  // Acquires the camera once per mount. paused is read from pausedRef inside
+  // tick() rather than captured here, so toggling it only skips decoding a
+  // frame — it must not tear down and re-request the stream, which would
+  // flicker the preview and re-prompt for camera permission.
   useEffect(() => {
     let stream: MediaStream | null = null;
     let frameId: number;
@@ -62,7 +71,7 @@ export default function QrScanner({ onDecode, paused = false }: QrScannerProps) 
         return;
       }
 
-      if (!paused) {
+      if (!pausedRef.current) {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext("2d");
@@ -86,7 +95,7 @@ export default function QrScanner({ onDecode, paused = false }: QrScannerProps) 
       cancelAnimationFrame(frameId);
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [paused]);
+  }, []);
 
   if (cameraError) {
     return (

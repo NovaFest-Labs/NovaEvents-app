@@ -10,9 +10,10 @@ const mockJsQR = vi.mocked(jsQR);
 function mockCameraAvailable() {
   const track = { stop: vi.fn() };
   const stream = { getTracks: () => [track] } as unknown as MediaStream;
+  const getUserMedia = vi.fn().mockResolvedValue(stream);
 
   Object.defineProperty(navigator, "mediaDevices", {
-    value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    value: { getUserMedia },
     configurable: true,
   });
 
@@ -43,7 +44,7 @@ function mockCameraAvailable() {
     fakeCtx as unknown as CanvasRenderingContext2D
   );
 
-  return { track };
+  return { track, getUserMedia };
 }
 
 beforeEach(() => {
@@ -87,6 +88,23 @@ describe("QrScanner", () => {
 
     await new Promise((r) => setTimeout(r, 50));
     expect(onDecode).not.toHaveBeenCalled();
+  });
+
+  it("keeps the same camera stream running when paused toggles, instead of re-acquiring it", async () => {
+    // paused only needs to stop tick() from reporting a decode (covered by
+    // "does not decode while paused" above) — it must not tear down and
+    // re-request the camera, which would flicker the preview and re-prompt
+    // for permission every time an organizer's in-flight check-in toggles it.
+    const { getUserMedia } = mockCameraAvailable();
+    const onDecode = vi.fn();
+
+    const { rerender } = render(<QrScanner onDecode={onDecode} paused={false} />);
+    await waitFor(() => expect(getUserMedia).toHaveBeenCalledTimes(1));
+
+    rerender(<QrScanner onDecode={onDecode} paused={true} />);
+    rerender(<QrScanner onDecode={onDecode} paused={false} />);
+
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
   });
 
   it("calls the latest onDecode passed by the parent, not a stale one from mount", async () => {
