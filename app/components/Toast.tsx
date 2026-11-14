@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type ToastType = "success" | "error";
 
@@ -17,17 +17,28 @@ interface ToastProps {
 
 export function Toast({ id, message, type, duration = DEFAULT_DURATION, onClose }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false);
+  const autoDismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (duration === 0) return;
 
-    const timer = setTimeout(() => {
+    autoDismissTimerRef.current = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => onClose(id), EXIT_ANIMATION_DELAY);
     }, duration);
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current);
+    };
   }, [duration, id, onClose]);
+
+  function handleManualClose() {
+    // Cancel the pending auto-dismiss timer — otherwise it fires later on
+    // an already-unmounted toast and calls onClose a second time.
+    if (autoDismissTimerRef.current) clearTimeout(autoDismissTimerRef.current);
+    setIsExiting(true);
+    setTimeout(() => onClose(id), EXIT_ANIMATION_DELAY);
+  }
 
   const baseStyles =
     "fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 transition-all duration-300 max-w-sm z-50";
@@ -51,10 +62,7 @@ export function Toast({ id, message, type, duration = DEFAULT_DURATION, onClose 
       <span className="flex-1 text-sm">{message}</span>
       <button
         type="button"
-        onClick={() => {
-          setIsExiting(true);
-          setTimeout(() => onClose(id), EXIT_ANIMATION_DELAY);
-        }}
+        onClick={handleManualClose}
         className="ml-2 hover:opacity-75 transition-opacity"
         aria-label="Close notification"
       >

@@ -104,6 +104,45 @@ describe("Toast", () => {
     );
   });
 
+  it("cancels the pending auto-dismiss timer when manually closed", () => {
+    // If the auto-dismiss timer from the effect isn't cancelled on manual
+    // close, it fires later on an already-unmounted toast and calls
+    // onClose a second time.
+    vi.useFakeTimers();
+    try {
+      const onClose = vi.fn();
+      render(
+        <Toast
+          id="test-6"
+          message="Manual close test"
+          type="success"
+          duration={5000}
+          onClose={onClose}
+        />
+      );
+
+      const closeButtons = screen.getAllByText("✕");
+      const closeButton = closeButtons[closeButtons.length - 1];
+      act(() => {
+        closeButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(onClose).toHaveBeenCalledTimes(1);
+
+      // Advance past the original 5000ms duration — the auto-dismiss timer
+      // must have been cancelled by the manual close above.
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(onClose).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("never auto-dismisses when duration is 0", () => {
     vi.useFakeTimers();
     try {
