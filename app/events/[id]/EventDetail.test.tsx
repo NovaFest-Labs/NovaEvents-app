@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { StrictMode } from "react";
 import type { EventDetail as EventDetailData } from "../../hooks/useEvent";
 
 vi.mock("../../hooks/useEvent", () => ({ useEvent: vi.fn() }));
@@ -195,6 +196,41 @@ describe("EventDetail", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
 
     expect(screen.getByLabelText("Sponsorship amount (USDC)")).toBeInTheDocument();
+  });
+
+  it("shows exactly one toast and refetches exactly once when a sponsorship settles under StrictMode", async () => {
+    // SponsorPanel handles the status -> toast/refetch transition directly in
+    // its render body (not a useEffect), which React's StrictMode
+    // double-invokes for every render in development to catch exactly this
+    // kind of impure render. A real network/toast side effect in render can
+    // fire twice per transition instead of once.
+    const showToast = vi.fn();
+    const refetch = vi.fn();
+    mockUseToast.mockReturnValue({ showToast, removeToast: vi.fn(), toasts: [] });
+    mockUseWallet.mockReturnValue(
+      walletState({ address: "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK" })
+    );
+    mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT, refetch }));
+
+    render(
+      <StrictMode>
+        <EventDetail id="1" />
+      </StrictMode>
+    );
+
+    fireEvent.change(screen.getByLabelText("Sponsorship amount (USDC)"), {
+      target: { value: "10" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Sponsor" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm & Sponsor" }));
+
+    // submit() always throws today (not wired up to the contract yet — see
+    // useSponsorEvent.ts), so this reliably reaches the "error" terminal
+    // state without needing to fake a real contract call.
+    await waitFor(() => expect(showToast).toHaveBeenCalled());
+
+    expect(showToast).toHaveBeenCalledTimes(1);
+    expect(refetch).not.toHaveBeenCalled();
   });
 
   it("shows a validation error when an invalid amount is submitted", () => {
