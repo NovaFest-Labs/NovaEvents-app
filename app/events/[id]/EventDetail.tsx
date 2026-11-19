@@ -12,7 +12,7 @@ import { useToast } from "../../context/ToastContext";
 import { useSponsorEvent, MAX_USDC } from "../../hooks/useSponsorEvent";
 
 const NOT_WIRED_UP_MESSAGE =
-  "This isn't wired up to the contract yet — see issue #1.";
+  "This isn't wired up to the contract yet — see issue #92.";
 
 // ─── Skeleton / error states ──────────────────────────────────────────────────
 
@@ -146,7 +146,7 @@ function BuyTicketButton({
   const disabled = !walletConnected || soldOut;
 
   function handleClick() {
-    // TODO (issue #1): call the Soroban contract client's buy_ticket
+    // TODO (issue #92): call the Soroban contract client's buy_ticket
     // entrypoint once the contract integration lands, e.g.
     //   await contractClient.buyTicket({ tier: tier.id, buyer: walletAddress })
     setMessage(NOT_WIRED_UP_MESSAGE);

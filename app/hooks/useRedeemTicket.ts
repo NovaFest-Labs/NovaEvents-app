@@ -20,7 +20,7 @@ interface UseRedeemTicketResult {
  * Checks a ticket in at the door by calling the contract's redeem_ticket
  * entrypoint.
  *
- * TODO (issue #1): once the Soroban contract client lands, call
+ * TODO (issue #92): once the Soroban contract client lands, call
  * contractClient.redeemTicket({ event: eventId, ticket: ticketId }) here.
  */
 export function useRedeemTicket(): UseRedeemTicketResult {
@@ -34,7 +34,7 @@ export function useRedeemTicket(): UseRedeemTicketResult {
     setError(null);
     try {
       throw new Error(
-        "Check-in isn't wired up to the contract yet — see issue #1."
+        "Check-in isn't wired up to the contract yet — see issue #92."
       );
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to check in ticket";

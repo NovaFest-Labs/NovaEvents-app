@@ -47,7 +47,7 @@ describe("useSponsorEvent", () => {
     });
 
     expect(result.current.status).toBe("error");
-    expect(result.current.error).toMatch(/issue #1/);
+    expect(result.current.error).toMatch(/issue #92/);
     // There is no POST /api/events/:id/sponsor route on the API — this must
     // not attempt a network call that would otherwise fail with a confusing 404.
     expect(fetch).not.toHaveBeenCalled();

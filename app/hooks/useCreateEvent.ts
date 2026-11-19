@@ -29,7 +29,7 @@ interface UseCreateEventResult {
 /**
  * Submits a signed create_event transaction via the organizer's wallet.
  *
- * TODO (issue #1): once the Soroban contract client lands, build the
+ * TODO (issue #92): once the Soroban contract client lands, build the
  * create_event invocation XDR from `input`, request a signature via
  * @stellar/freighter-api's signTransaction, and submit the signed
  * transaction to the network.
@@ -50,7 +50,7 @@ export function useCreateEvent(organizerAddress: string | null): UseCreateEventR
     setError(null);
     try {
       throw new Error(
-        "Event creation isn't wired up to the contract yet — see issue #1."
+        "Event creation isn't wired up to the contract yet — see issue #92."
       );
     } catch (err) {
       setStatus("error");

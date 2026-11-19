@@ -41,7 +41,7 @@ interface TicketQRProps {
  *   ⚠️  Owner address is visible inside the QR — acceptable because Stellar
  *       public keys are not secret, but worth noting.
  *   🔜  Next step: have the wallet sign a short-lived challenge (nonce + expiry)
- *       with Freighter once issue #1 lands, making replay attacks impossible.
+ *       with Freighter once issue #92 lands, making replay attacks impossible.
  */
 export default function TicketQR({
   eventId,

@@ -17,7 +17,7 @@ interface UseSponsorEventResult {
   /**
    * Submit the confirmed sponsorship.
    *
-   * TODO (issue #1): once the Soroban contract client lands, call
+   * TODO (issue #92): once the Soroban contract client lands, call
    *   await contractClient.sponsorEvent({ event: eventId, amount: stroops, sponsor: sponsorAddress })
    * There is no backend endpoint for this — sponsor_event requires the
    * sponsor's own signature (require_auth), which only their wallet can
@@ -56,7 +56,7 @@ export function useSponsorEvent(): UseSponsorEventResult {
     setError(null);
     try {
       throw new Error(
-        "Sponsoring isn't wired up to the contract yet — see issue #1."
+        "Sponsoring isn't wired up to the contract yet — see issue #92."
       );
     } catch (err) {
       const msg =

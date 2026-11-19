@@ -20,11 +20,12 @@ Open [http://localhost:3000](http://localhost:3000).
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **Styles:** Tailwind CSS
-- **Contract interaction:** `@stellar/stellar-sdk` (to be integrated)
+- **Wallet connection:** `@creit.tech/stellar-wallets-kit` (Freighter, Lobstr, Albedo, xBull, Rabet) + `@stellar/freighter-api` — done
+- **Contract writes** (buy ticket, sponsor, create event, check-in): not yet wired up — see [#92](https://github.com/NovaFest-Labs/NovaEvents-app/issues/92)
 
 ## Open for contributors
 
-- Connect wallet (Freighter)
+- Wire up contract writes (buy ticket, sponsor, create event, check-in) — see [#92](https://github.com/NovaFest-Labs/NovaEvents-app/issues/92)
 - Organizer dashboard — create events, manage tiers
 - Attendee view — browse events, buy tickets
 - Sponsor view — contribute to events, see public sponsorship breakdown

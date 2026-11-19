@@ -33,7 +33,7 @@ describe("OrganizerEventCard", () => {
     fireEvent.change(screen.getByLabelText("Ticket ID"), { target: { value: "42" } });
     fireEvent.click(screen.getByRole("button", { name: "Check In" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #92/);
   });
 
   it("clears a stale check-in message once the ticket ID is edited again", async () => {
@@ -41,7 +41,7 @@ describe("OrganizerEventCard", () => {
 
     fireEvent.change(screen.getByLabelText("Ticket ID"), { target: { value: "42" } });
     fireEvent.click(screen.getByRole("button", { name: "Check In" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #92/);
 
     fireEvent.change(screen.getByLabelText("Ticket ID"), { target: { value: "43" } });
 

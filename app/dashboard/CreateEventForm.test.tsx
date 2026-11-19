@@ -103,7 +103,7 @@ describe("CreateEventForm", () => {
     fillRequiredFields();
     fireEvent.click(screen.getByRole("button", { name: "Create Event" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #1/);
+    expect(await screen.findByRole("alert")).toHaveTextContent(/issue #92/);
   });
   
   it("strips leading/trailing whitespace from a submitted tier name", async () => {

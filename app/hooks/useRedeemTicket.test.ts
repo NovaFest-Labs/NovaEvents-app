@@ -11,7 +11,7 @@ describe("useRedeemTicket", () => {
     });
 
     expect(result.current.status).toBe("error");
-    expect(result.current.error).toMatch(/issue #1/);
+    expect(result.current.error).toMatch(/issue #92/);
   });
 
   it("resets status and error", async () => {
