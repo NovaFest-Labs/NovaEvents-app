@@ -1,16 +1,14 @@
 import Link from "next/link";
 import { formatUsdc } from "../lib/formatUsdc";
+import { formatEventDate } from "../lib/eventFormatting";
 import type { EventSummary } from "../hooks/useEvents";
 
 export default function EventCard({ event }: { event: EventSummary }) {
-  const parsedDate = new Date(event.date ?? NaN);
-  const formattedDate = Number.isNaN(parsedDate.getTime())
-    ? "Date TBA"
-    : parsedDate.toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+  const formattedDate = formatEventDate(event.date, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
   return (
     <Link

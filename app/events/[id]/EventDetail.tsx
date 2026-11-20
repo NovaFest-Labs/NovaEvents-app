@@ -7,6 +7,7 @@ import CopyableAddress from "../../components/CopyableAddress";
 import { useWallet } from "../../hooks/useWallet";
 import { useEvent, type TicketTier } from "../../hooks/useEvent";
 import { formatUsdc } from "../../lib/formatUsdc";
+import { formatEventDate } from "../../lib/eventFormatting";
 import { shortenAddress } from "../../lib/shortenAddress";
 import { useToast } from "../../context/ToastContext";
 import { useSponsorEvent, MAX_USDC } from "../../hooks/useSponsorEvent";
@@ -348,14 +349,6 @@ function SponsorPanel({
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-
-function formatEventDate(date: string | undefined): string {
-  // `date` is absent when the on-chain date can't be represented in JS.
-  const parsed = new Date(date ?? NaN);
-  return Number.isNaN(parsed.getTime())
-    ? "Date TBA"
-    : parsed.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
-}
 
 export default function EventDetail({ id }: { id: string }) {
   const { event, loading, error, notFound, refetch } = useEvent(id);
