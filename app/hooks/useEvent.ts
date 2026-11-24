@@ -92,7 +92,7 @@ export function useEvent(id: string): UseEventResult {
 
     fetchEvent();
     return () => controller.abort();
-  }, [id, epoch]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id, epoch]);
 
   return { event, loading, error, notFound, refetch };
 }
