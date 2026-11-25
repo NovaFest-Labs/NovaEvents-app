@@ -75,4 +75,49 @@ describe("CopyableAddress", () => {
       vi.useRealTimers();
     }
   });
+
+  it("restarts the 2-second window on a second click, instead of reverting on the first click's original timer", async () => {
+    vi.useFakeTimers();
+    try {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+
+      render(<CopyableAddress address={ADDRESS} />);
+      const button = screen.getByRole("button", { name: /copy wallet address/i });
+
+      await act(async () => {
+        fireEvent.click(button);
+        await Promise.resolve();
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+      expect(button).toHaveTextContent("✓");
+
+      // Click again before the first timer fires — this should push the
+      // reversion out another full 2 seconds, not leave the original timer
+      // running underneath it.
+      await act(async () => {
+        fireEvent.click(button);
+        await Promise.resolve();
+      });
+
+      // 1s past the second click, but only 500ms before the ORIGINAL
+      // timer's 2s mark would have fired (1.5s + 1s = 2.5s since the first
+      // click). The icon must still read copied.
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(button).toHaveTextContent("✓");
+
+      // Now past the second click's own 2s window.
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(button).toHaveTextContent("⧉");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface CopyableAddressProps {
   address: string;
@@ -12,12 +12,23 @@ export default function CopyableAddress({
   className,
 }: CopyableAddressProps) {
   const [copied, setCopied] = useState(false);
+  const revertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (revertTimerRef.current) clearTimeout(revertTimerRef.current);
+    };
+  }, []);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(address);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Clicking again before the previous 2s window elapses must restart
+      // it, not leave the earlier timer running underneath and reverting
+      // the indicator early.
+      if (revertTimerRef.current) clearTimeout(revertTimerRef.current);
+      revertTimerRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard access can fail (denied permission, insecure context, etc.)
       // — silently no-op rather than throwing in the UI.
