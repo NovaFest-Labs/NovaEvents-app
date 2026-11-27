@@ -182,6 +182,30 @@ describe("EventDetail", () => {
     expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument();
   });
 
+  it("disables Confirm & Sponsor if the wallet disconnects while on the confirmation step", () => {
+    mockUseWallet.mockReturnValue(
+      walletState({ address: "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK" })
+    );
+    mockUseEvent.mockReturnValue(eventState({ event: STUB_EVENT }));
+    const { rerender } = render(<EventDetail id="1" />);
+
+    fireEvent.change(screen.getByLabelText("Sponsorship amount (USDC)"), {
+      target: { value: "10" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Sponsor" }));
+    expect(screen.getByRole("button", { name: "Confirm & Sponsor" })).toBeEnabled();
+
+    // Wallet disconnect is reachable from Nav on every page, including this
+    // one, while the confirmation step is still showing.
+    mockUseWallet.mockReturnValue(walletState({ address: null }));
+    rerender(<EventDetail id="1" />);
+
+    expect(screen.getByRole("button", { name: "Confirm & Sponsor" })).toBeDisabled();
+    expect(
+      screen.getByText(/wallet disconnected.*reconnect to continue/i)
+    ).toBeInTheDocument();
+  });
+
   it("returns to the amount-input step when Back is clicked", () => {
     mockUseWallet.mockReturnValue(
       walletState({ address: "GBWMCCC3NHSKLAOJDBKKYW7SSH2PFTTNVFKWKH6BDLSZRA4ZBXVQBBK" })

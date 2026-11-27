@@ -280,9 +280,10 @@ function SponsorPanel({
           <button
             type="button"
             onClick={() => {
-              void submit(eventId, walletAddress!);
+              if (!walletAddress) return;
+              void submit(eventId, walletAddress);
             }}
-            disabled={isPending}
+            disabled={isPending || !walletAddress}
             className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
           >
             {isPending ? "Submitting…" : "Confirm & Sponsor"}
@@ -296,6 +297,11 @@ function SponsorPanel({
             Back
           </button>
         </div>
+        {!walletAddress && (
+          <p className="text-xs text-red-400 mt-3">
+            Wallet disconnected. Reconnect to continue.
+          </p>
+        )}
       </div>
     );
   }
