@@ -9,8 +9,9 @@ interface ApiEvent {
   id: string;
   name: string;
   description: string;
-  // cover_image_url will be available once API issue #14 lands
-  cover_image_url?: string;
+  // The API's event-detail shape (toEventDetail) returns the field as
+  // `image_url`, not `cover_image_url`.
+  image_url?: string;
 }
 
 async function fetchEvent(id: string): Promise<ApiEvent | null> {
@@ -41,8 +42,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${event.name} — NovaEvents`;
   const description = event.description || "View event details on NovaEvents.";
 
-  const images = event.cover_image_url
-    ? [{ url: event.cover_image_url }]
+  const images = event.image_url
+    ? [{ url: event.image_url }]
     : undefined;
 
   return {
