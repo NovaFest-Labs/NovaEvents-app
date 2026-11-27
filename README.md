@@ -20,8 +20,8 @@ Open [http://localhost:3000](http://localhost:3000).
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **Styles:** Tailwind CSS
-- **Wallet connection:** `@creit.tech/stellar-wallets-kit` (Freighter, Lobstr, Albedo, xBull, Rabet) + `@stellar/freighter-api` — done
-- **Contract writes** (buy ticket, sponsor, create event, check-in): not yet wired up — see [#92](https://github.com/NovaFest-Labs/NovaEvents-app/issues/92)
+- **Wallet connection:** `@creit.tech/stellar-wallets-kit` (Freighter, Lobstr, Albedo, xBull, Rabet) — done
+- **Contract writes** (buy ticket, sponsor, create event, check-in): not yet wired up — see [#92](https://github.com/NovaFest-Labs/NovaEvents-app/issues/92). `@stellar/freighter-api` is already a dependency for this, but nothing imports it yet.
 
 ## Open for contributors
 
